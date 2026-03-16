@@ -1,0 +1,11 @@
+name = "ANARI"
+uuid = "e8f0e1a0-5c3a-4b1e-9f0a-1c2d3e4f5a6b"
+version = "0.1.0"
+
+[deps]
+CEnum = "fa961155-64e5-5f13-b03f-caf6b980ea82"
+ANARI_SDK_jll = "b4f1dd5d-d354-485e-8d07-ad6f10ecf726"
+
+[compat]
+julia = "1.6"
+CEnum = "0.4, 0.5"
