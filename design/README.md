@@ -1,6 +1,10 @@
 # Design Notes
 
-This directory contains design and planning material for the `ANARI.jl` wrapper project.
+This directory contains design and planning material for the `ANARI.jl` wrapper project. This project intends to create an idiomatic Julia interface to the ANARI API from the Khronos Group. For now we are following the 1.1 specification from https://registry.khronos.org/ANARI/specs/1.1/ANARI-1.1.html.
+
+## Environment
+
+This package supposes that Julia 1.12 is installed and the ANARI_SDK_jll package is available in the environment.
 
 ## Contents
 
