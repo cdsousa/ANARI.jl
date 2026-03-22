@@ -1,4 +1,4 @@
-export ANARIHandle, Library, Device, World, Frame, Camera, Renderer, release!
+export ANARIHandle, Library, Device, World, Frame, Camera, Renderer, Array1D, release!
 
 abstract type ANARIHandle end
 
@@ -110,6 +110,24 @@ mutable struct Renderer <: ANARIObjectHandle
         finalizer(obj) do renderer
             try
                 release!(renderer)
+            catch
+                nothing
+            end
+        end
+        return obj
+    end
+end
+
+mutable struct Array1D <: ANARIObjectHandle
+    ptr::LibANARI.ANARIArray1D
+    device::Device
+
+    function Array1D(ptr::LibANARI.ANARIArray1D, device::Device)
+        _require_nonnull(ptr, "anariNewArray1D")
+        obj = new(ptr, device)
+        finalizer(obj) do array
+            try
+                release!(array)
             catch
                 nothing
             end

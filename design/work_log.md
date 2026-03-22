@@ -41,3 +41,8 @@ This file tracks implementation progress in short, chronological entries.
 - *Summary*: Refactored rendering/frame-mapping APIs and parameter marshaling/commit APIs into dedicated module files without changing behavior or external API.
 - *Files*: `src/render.jl` (new), `src/parameters.jl` (new), `src/handles.jl`, `src/ANARI.jl`, `design/work_log.md`
 - *Notes*: Kept exports and method signatures stable while separating concerns across handle lifecycle, parameter, and render/frame modules; preserved public API (`setparam!`, `commit!`, inferred `setparam!`) and validated with a full passing `Pkg.test()` run.
+
+### Entry 7
+- *Summary*: Added first array wrapper milestone with `Array1D` handle type and `new_array1d` copy helper; added `map_array`/`unmap_array` wrappers and tests validating copy correctness.
+- *Files*: `src/handles.jl`, `src/arrays.jl` (new), `src/ANARI.jl`, `test/handles_test.jl`, `design/work_log.md`
+- *Notes*: `new_array1d` currently targets 1D arrays and copies from Julia memory into ANARI-managed memory via map/unmap; full test suite passes with `Pkg.test()`.

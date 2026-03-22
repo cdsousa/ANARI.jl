@@ -144,3 +144,28 @@ end
     @test_throws ArgumentError ANARI.map_frame(dev, frame)
     @test_throws ArgumentError ANARI.unmap_frame(dev, frame)
 end
+
+@testset "Handle wrappers array copy helper" begin
+    lib = ANARI.Library("helide")
+    dev = ANARI.Device(lib, "default")
+
+    input = Float32[1, 2, 3, 5, 8]
+    array = ANARI.new_array1d(dev, input)
+    @test array.ptr != C_NULL
+
+    data_ptr = ANARI.map_array(dev, array)
+    @test data_ptr != C_NULL
+
+    copied = unsafe_wrap(Vector{Float32}, Ptr{Float32}(data_ptr), length(input))
+    @test copied == input
+
+    ANARI.unmap_array(dev, array)
+
+    ANARI.release!(array)
+    ANARI.release!(dev)
+    ANARI.release!(lib)
+
+    @test array.ptr == C_NULL
+    @test_throws ArgumentError ANARI.map_array(dev, array)
+    @test_throws ArgumentError ANARI.unmap_array(dev, array)
+end

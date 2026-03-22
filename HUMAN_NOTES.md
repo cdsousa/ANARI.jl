@@ -6,3 +6,4 @@ Unfortunately, the discussion and design decisions were not captured anywhere.
 
 In the second commit, only design notes were produced, but this time they were captured in `design` folder, along with AI chat transcripts. The files produced by the AI agent have been reviewed and edited by me where I deemed necessary. 
 
+Some agent sessions were split into multiple commits. The chat transcripts for those are recorded in a single file in the last commit.
