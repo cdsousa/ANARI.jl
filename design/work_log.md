@@ -56,3 +56,8 @@ This file tracks implementation progress in short, chronological entries.
 - *Summary*: Added external `Library(name, callback::Function)` constructor to install user-provided status logging callbacks with safe callback-reference retention.
 - *Files*: `src/status.jl`, `src/handles.jl`, `test/status_test.jl`, `design/work_log.md`
 - *Notes*: User callback supports either `(message)` or `(severity, code, source_type, message)` signatures; callback exceptions are caught and forwarded to Julia logging, then ANARI status is still logged.
+
+### Entry 10
+- *Summary*: Added a full throwaway rendering sample that generates three 1920x1080 PNG images (90-degree rotation per image) with side-by-side triangles; documented wrapper API gaps exposed by the sample and renamed the throwaway workspace folder from `examples/` to `experiments/`.
+- *Files*: `experiments/triangle_gallery/run.jl`, `experiments/triangle_gallery/Project.toml`, `experiments/triangle_gallery/Manifest.toml`, `experiments/triangle_gallery/README.md`, `experiments/triangle_gallery/gap.md`, `experiments/triangle_gallery/output/triangles_01_0deg.png`, `experiments/triangle_gallery/output/triangles_02_90deg.png`, `experiments/triangle_gallery/output/triangles_03_180deg.png`, `design/work_log.md`
+- *Notes*: Gap analysis confirms current wrapper limitations around scene-object wrappers and broader parameter marshalling; generated PNGs were validated after background-color handling adjustments for this backend.
