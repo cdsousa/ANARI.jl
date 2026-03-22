@@ -28,6 +28,13 @@ anari_type(::Type{World})    = LibANARI.ANARI_WORLD
 anari_type(::Type{Frame})    = LibANARI.ANARI_FRAME
 anari_type(::Type{Camera})   = LibANARI.ANARI_CAMERA
 anari_type(::Type{Renderer}) = LibANARI.ANARI_RENDERER
+anari_type(::Type{Geometry}) = LibANARI.ANARI_GEOMETRY
+anari_type(::Type{Material}) = LibANARI.ANARI_MATERIAL
+anari_type(::Type{Surface})  = LibANARI.ANARI_SURFACE
+anari_type(::Type{Group})    = LibANARI.ANARI_GROUP
+anari_type(::Type{Instance}) = LibANARI.ANARI_INSTANCE
+anari_type(::Type{Light})    = LibANARI.ANARI_LIGHT
+anari_type(::Type{<:Array1D}) = LibANARI.ANARI_ARRAY1D
 
 """
     setparam!(device, object, name, value)

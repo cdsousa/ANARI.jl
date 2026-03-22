@@ -1,4 +1,18 @@
-export ANARIHandle, Library, Device, World, Frame, Camera, Renderer, Array1D, release!
+export ANARIHandle,
+       Library,
+       Device,
+       World,
+       Frame,
+       Camera,
+       Renderer,
+       Geometry,
+       Material,
+       Surface,
+       Group,
+       Instance,
+       Light,
+       Array1D,
+       release!
 
 abstract type ANARIHandle end
 
@@ -126,6 +140,114 @@ mutable struct Renderer <: ANARIObjectHandle
     end
 end
 
+mutable struct Geometry <: ANARIObjectHandle
+    ptr::LibANARI.ANARIGeometry
+    device::Device
+
+    function Geometry(ptr::LibANARI.ANARIGeometry, device::Device)
+        _require_nonnull(ptr, "anariNewGeometry")
+        obj = new(ptr, device)
+        finalizer(obj) do geometry
+            try
+                release!(geometry)
+            catch
+                nothing
+            end
+        end
+        return obj
+    end
+end
+
+mutable struct Material <: ANARIObjectHandle
+    ptr::LibANARI.ANARIMaterial
+    device::Device
+
+    function Material(ptr::LibANARI.ANARIMaterial, device::Device)
+        _require_nonnull(ptr, "anariNewMaterial")
+        obj = new(ptr, device)
+        finalizer(obj) do material
+            try
+                release!(material)
+            catch
+                nothing
+            end
+        end
+        return obj
+    end
+end
+
+mutable struct Surface <: ANARIObjectHandle
+    ptr::LibANARI.ANARISurface
+    device::Device
+
+    function Surface(ptr::LibANARI.ANARISurface, device::Device)
+        _require_nonnull(ptr, "anariNewSurface")
+        obj = new(ptr, device)
+        finalizer(obj) do surface
+            try
+                release!(surface)
+            catch
+                nothing
+            end
+        end
+        return obj
+    end
+end
+
+mutable struct Group <: ANARIObjectHandle
+    ptr::LibANARI.ANARIGroup
+    device::Device
+
+    function Group(ptr::LibANARI.ANARIGroup, device::Device)
+        _require_nonnull(ptr, "anariNewGroup")
+        obj = new(ptr, device)
+        finalizer(obj) do group
+            try
+                release!(group)
+            catch
+                nothing
+            end
+        end
+        return obj
+    end
+end
+
+mutable struct Instance <: ANARIObjectHandle
+    ptr::LibANARI.ANARIInstance
+    device::Device
+
+    function Instance(ptr::LibANARI.ANARIInstance, device::Device)
+        _require_nonnull(ptr, "anariNewInstance")
+        obj = new(ptr, device)
+        finalizer(obj) do instance
+            try
+                release!(instance)
+            catch
+                nothing
+            end
+        end
+        return obj
+    end
+end
+
+mutable struct Light <: ANARIObjectHandle
+    ptr::LibANARI.ANARILight
+    device::Device
+
+    function Light(ptr::LibANARI.ANARILight, device::Device)
+        _require_nonnull(ptr, "anariNewLight")
+        obj = new(ptr, device)
+        finalizer(obj) do light
+            try
+                release!(light)
+            catch
+                nothing
+            end
+        end
+        return obj
+    end
+end
+
 mutable struct Array1D{T} <: ANARIObjectHandle
     ptr::LibANARI.ANARIArray1D
     device::Device
@@ -191,6 +313,42 @@ function Renderer(device::Device, subtype::AbstractString)
     _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
     ptr = LibANARI.anariNewRenderer(device.ptr, subtype)
     return Renderer(ptr, device)
+end
+
+function Geometry(device::Device, subtype::AbstractString)
+    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
+    ptr = LibANARI.anariNewGeometry(device.ptr, subtype)
+    return Geometry(ptr, device)
+end
+
+function Material(device::Device, subtype::AbstractString)
+    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
+    ptr = LibANARI.anariNewMaterial(device.ptr, subtype)
+    return Material(ptr, device)
+end
+
+function Surface(device::Device)
+    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
+    ptr = LibANARI.anariNewSurface(device.ptr)
+    return Surface(ptr, device)
+end
+
+function Group(device::Device)
+    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
+    ptr = LibANARI.anariNewGroup(device.ptr)
+    return Group(ptr, device)
+end
+
+function Instance(device::Device, subtype::AbstractString)
+    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
+    ptr = LibANARI.anariNewInstance(device.ptr, subtype)
+    return Instance(ptr, device)
+end
+
+function Light(device::Device, subtype::AbstractString)
+    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
+    ptr = LibANARI.anariNewLight(device.ptr, subtype)
+    return Light(ptr, device)
 end
 
 function release!(library::Library)

@@ -1,5 +1,37 @@
 export new_array1d, map_array, unmap_array
 
+function new_array1d(device::Device, data::AbstractVector{T}) where {T<:ANARIObjectHandle}
+    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
+
+    values = LibANARI.ANARIObject[]
+    sizehint!(values, length(data))
+    for object in data
+        _isnull(object.ptr) && throw(ArgumentError("array element handle has already been released"))
+        push!(values, _as_anari_object(object))
+    end
+
+    ptr = LibANARI.anariNewArray1D(
+        device.ptr,
+        C_NULL,
+        C_NULL,
+        C_NULL,
+        anari_type(T),
+        UInt64(length(values)),
+    )
+    array = Array1D{LibANARI.ANARIObject}(ptr, device, length(values))
+
+    mapped = LibANARI.anariMapArray(device.ptr, array.ptr)
+    _isnull(mapped) && throw(ErrorException("anariMapArray returned a null data pointer"))
+
+    try
+        unsafe_copyto!(Ptr{LibANARI.ANARIObject}(mapped), pointer(values), length(values))
+    finally
+        LibANARI.anariUnmapArray(device.ptr, array.ptr)
+    end
+
+    return array
+end
+
 function new_array1d(device::Device, data::AbstractVector{T}) where {T}
     _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
 

@@ -10,11 +10,18 @@ end
 
 function _check_object_dtype(dtype::LibANARI.ANARIDataType)
     return dtype in (
+        LibANARI.ANARI_ARRAY1D,
         LibANARI.ANARI_DEVICE,
         LibANARI.ANARI_OBJECT,
         LibANARI.ANARI_CAMERA,
         LibANARI.ANARI_FRAME,
+        LibANARI.ANARI_GEOMETRY,
+        LibANARI.ANARI_GROUP,
+        LibANARI.ANARI_INSTANCE,
+        LibANARI.ANARI_LIGHT,
+        LibANARI.ANARI_MATERIAL,
         LibANARI.ANARI_RENDERER,
+        LibANARI.ANARI_SURFACE,
         LibANARI.ANARI_WORLD,
     )
 end

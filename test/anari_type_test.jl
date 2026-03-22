@@ -20,6 +20,12 @@
     @test ANARI.anari_type(ANARI.Frame)    == L.ANARI_FRAME
     @test ANARI.anari_type(ANARI.Camera)   == L.ANARI_CAMERA
     @test ANARI.anari_type(ANARI.Renderer) == L.ANARI_RENDERER
+    @test ANARI.anari_type(ANARI.Geometry) == L.ANARI_GEOMETRY
+    @test ANARI.anari_type(ANARI.Material) == L.ANARI_MATERIAL
+    @test ANARI.anari_type(ANARI.Surface)  == L.ANARI_SURFACE
+    @test ANARI.anari_type(ANARI.Group)    == L.ANARI_GROUP
+    @test ANARI.anari_type(ANARI.Instance) == L.ANARI_INSTANCE
+    @test ANARI.anari_type(ANARI.Light)    == L.ANARI_LIGHT
 end
 
 @testset "setparam! inferred dtype" begin

@@ -66,6 +66,63 @@ end
     @test_throws ArgumentError ANARI.setparam!(dev, frame, "size", ANARI.LibANARI.ANARI_UINT32_VEC2, size)
 end
 
+@testset "Handle wrappers scene object constructors and commit flow" begin
+    lib = ANARI.Library("helide")
+    dev = ANARI.Device(lib, "default")
+
+    world = ANARI.World(dev)
+    geometry = ANARI.Geometry(dev, "triangle")
+    material = ANARI.Material(dev, "matte")
+    surface = ANARI.Surface(dev)
+    group = ANARI.Group(dev)
+    instance = ANARI.Instance(dev, "transform")
+    light = ANARI.Light(dev, "directional")
+
+    @test world.ptr != C_NULL
+    @test geometry.ptr != C_NULL
+    @test material.ptr != C_NULL
+    @test surface.ptr != C_NULL
+    @test group.ptr != C_NULL
+    @test instance.ptr != C_NULL
+    @test light.ptr != C_NULL
+
+    ANARI.setparam!(dev, surface, "geometry", ANARI.LibANARI.ANARI_GEOMETRY, geometry)
+    ANARI.setparam!(dev, surface, "material", ANARI.LibANARI.ANARI_MATERIAL, material)
+    ANARI.commit!(dev, geometry)
+    ANARI.commit!(dev, material)
+    ANARI.commit!(dev, surface)
+
+    surface_array = ANARI.new_array1d(dev, [surface])
+    ANARI.setparam!(dev, group, "surface", ANARI.LibANARI.ANARI_ARRAY1D, surface_array)
+    ANARI.commit!(dev, group)
+
+    ANARI.setparam!(dev, instance, "group", ANARI.LibANARI.ANARI_GROUP, group)
+    ANARI.commit!(dev, instance)
+
+    instance_array = ANARI.new_array1d(dev, [instance])
+    ANARI.setparam!(dev, world, "instance", ANARI.LibANARI.ANARI_ARRAY1D, instance_array)
+    ANARI.commit!(dev, world)
+
+    ANARI.release!(instance_array)
+    ANARI.release!(surface_array)
+    ANARI.release!(light)
+    ANARI.release!(instance)
+    ANARI.release!(group)
+    ANARI.release!(surface)
+    ANARI.release!(material)
+    ANARI.release!(geometry)
+    ANARI.release!(world)
+    ANARI.release!(dev)
+    ANARI.release!(lib)
+
+    @test_throws ArgumentError ANARI.Geometry(dev, "triangle")
+    @test_throws ArgumentError ANARI.Material(dev, "matte")
+    @test_throws ArgumentError ANARI.Surface(dev)
+    @test_throws ArgumentError ANARI.Group(dev)
+    @test_throws ArgumentError ANARI.Instance(dev, "transform")
+    @test_throws ArgumentError ANARI.Light(dev, "directional")
+end
+
 @testset "Handle wrappers render and wait flow" begin
     lib = ANARI.Library("helide")
     dev = ANARI.Device(lib, "default")
