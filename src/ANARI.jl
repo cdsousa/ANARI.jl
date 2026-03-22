@@ -5,6 +5,7 @@ using ANARI_SDK_jll
 
 # Include the generated bindings
 include("LibANARI.jl")
+include("status.jl")
 include("handles.jl")
 include("parameters.jl")
 include("render.jl")

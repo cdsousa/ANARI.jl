@@ -46,3 +46,8 @@ This file tracks implementation progress in short, chronological entries.
 - *Summary*: Added first array wrapper milestone with `Array1D` handle type and `new_array1d` copy helper; added `map_array`/`unmap_array` wrappers and tests validating copy correctness.
 - *Files*: `src/handles.jl`, `src/arrays.jl` (new), `src/ANARI.jl`, `test/handles_test.jl`, `design/work_log.md`
 - *Notes*: `new_array1d` currently targets 1D arrays and copies from Julia memory into ANARI-managed memory via map/unmap; full test suite passes with `Pkg.test()`.
+
+### Entry 8
+- *Summary*: Added status callback logging bridge and `Library(...; status_logging=true)` constructor path; mapped ANARI severities to Julia logging levels and added tests for level routing.
+- *Files*: `src/status.jl` (new), `src/ANARI.jl`, `src/handles.jl`, `test/status_test.jl` (new), `test/runtests.jl`, `Project.toml`, `design/work_log.md`
+- *Notes*: Callback is installed via `anariLoadLibrary` using a stable `@cfunction` pointer; library now stores callback metadata and clears it on `release!`; full test suite passes with `Pkg.test()`.
