@@ -1,4 +1,4 @@
-export ANARIHandle, Library, Device, World, Frame, Camera, Renderer, release!, setparam!, commit!
+export ANARIHandle, Library, Device, World, Frame, Camera, Renderer, release!, setparam!, commit!, render!, wait_frame!, render_and_wait!
 
 abstract type ANARIHandle end
 
@@ -251,4 +251,32 @@ function commit!(device::Device, object::Union{Device, ANARIObjectHandle})
 
     LibANARI.anariCommitParameters(device.ptr, object_ptr)
     return object
+end
+
+function render!(device::Device, frame::Frame)
+    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
+    _isnull(frame.ptr) && throw(ArgumentError("frame handle has already been released"))
+
+    LibANARI.anariRenderFrame(device.ptr, frame.ptr)
+    return frame
+end
+
+function wait_frame!(
+    device::Device,
+    frame::Frame;
+    mode::LibANARI.ANARIWaitMask=LibANARI.ANARIWaitMask(LibANARI.ANARI_WAIT),
+)
+    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
+    _isnull(frame.ptr) && throw(ArgumentError("frame handle has already been released"))
+
+    return LibANARI.anariFrameReady(device.ptr, frame.ptr, mode)
+end
+
+function render_and_wait!(
+    device::Device,
+    frame::Frame;
+    mode::LibANARI.ANARIWaitMask=LibANARI.ANARIWaitMask(LibANARI.ANARI_WAIT),
+)
+    render!(device, frame)
+    return wait_frame!(device, frame; mode=mode)
 end

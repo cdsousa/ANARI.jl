@@ -33,8 +33,8 @@ function sample_usage()
     ]
     indices = [(UInt32(0), UInt32(1), UInt32(2))]
 
-    vtx_array = Array1D(dev, vertices; copy=true)
-    idx_array = Array1D(dev, indices; copy=true)
+    vtx_array = Array1D(dev, vertices)
+    idx_array = Array1D(dev, indices)
 
     setparam!(dev, geometry, "vertex.position", vtx_array)
     setparam!(dev, geometry, "primitive.index", idx_array)
@@ -44,13 +44,13 @@ function sample_usage()
     setparam!(dev, surface, "material", material)
     commit!(dev, surface)
 
-    setparam!(dev, group, "surface", Array1D(dev, [surface]; copy=true))
+    setparam!(dev, group, "surface", [surface])
     commit!(dev, group)
 
     setparam!(dev, instance, "group", group)
     commit!(dev, instance)
 
-    setparam!(dev, world, "instance", Array1D(dev, [instance]; copy=true))
+    setparam!(dev, world, "instance",  [instance])
     commit!(dev, world)
 
     # 5) Frame setup + synchronous rendering helpers

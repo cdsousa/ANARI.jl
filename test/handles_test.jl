@@ -65,3 +65,41 @@ end
     @test_throws ArgumentError ANARI.commit!(dev, frame)
     @test_throws ArgumentError ANARI.setparam!(dev, frame, "size", ANARI.LibANARI.ANARI_UINT32_VEC2, size)
 end
+
+@testset "Handle wrappers render and wait flow" begin
+    lib = ANARI.Library("helide")
+    dev = ANARI.Device(lib, "default")
+
+    renderer = ANARI.Renderer(dev, "default")
+    camera = ANARI.Camera(dev, "default")
+    world = ANARI.World(dev)
+    frame = ANARI.Frame(dev)
+
+    ANARI.setparam!(dev, frame, "size", (UInt32(64), UInt32(64)))
+    ANARI.setparam!(dev, frame, "renderer", renderer)
+    ANARI.setparam!(dev, frame, "camera", camera)
+    ANARI.setparam!(dev, frame, "world", world)
+
+    ANARI.commit!(dev, renderer)
+    ANARI.commit!(dev, camera)
+    ANARI.commit!(dev, world)
+    ANARI.commit!(dev, frame)
+
+    @test ANARI.render!(dev, frame) === frame
+
+    ready = ANARI.wait_frame!(dev, frame)
+    @test ready != 0
+
+    ready2 = ANARI.render_and_wait!(dev, frame)
+    @test ready2 != 0
+
+    ANARI.release!(frame)
+    ANARI.release!(world)
+    ANARI.release!(camera)
+    ANARI.release!(renderer)
+    ANARI.release!(dev)
+    ANARI.release!(lib)
+
+    @test_throws ArgumentError ANARI.render!(dev, frame)
+    @test_throws ArgumentError ANARI.wait_frame!(dev, frame)
+end
