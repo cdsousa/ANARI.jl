@@ -20,10 +20,10 @@ function sample_usage()
     instance = Instance(dev, "transform")
     world = World(dev)
 
-    # 3) Explicit typed parameter API for v1
-    setparam!(dev, camera, "position", ANARI_FLOAT32_VEC3, (0.0f0, 0.0f0, 3.0f0))
-    setparam!(dev, camera, "direction", ANARI_FLOAT32_VEC3, (0.0f0, 0.0f0, -1.0f0))
-    setparam!(dev, renderer, "background", ANARI_FLOAT32_VEC3, (0.02f0, 0.02f0, 0.03f0))
+    # 3) Inferred typed parameter API — dtype derived from value via anari_type
+    setparam!(dev, camera,   "position",   (0.0f0, 0.0f0,  3.0f0))
+    setparam!(dev, camera,   "direction",  (0.0f0, 0.0f0, -1.0f0))
+    setparam!(dev, renderer, "background", (0.02f0, 0.02f0, 0.03f0))
 
     # 4) Thin array helper that copies into ANARI-owned memory
     vertices = [
@@ -31,34 +31,34 @@ function sample_usage()
         ( 1.0f0, -1.0f0, 0.0f0),
         ( 0.0f0,  1.0f0, 0.0f0),
     ]
-    indices = [(0, 1, 2)]
+    indices = [(UInt32(0), UInt32(1), UInt32(2))]
 
     vtx_array = Array1D(dev, vertices; copy=true)
     idx_array = Array1D(dev, indices; copy=true)
 
-    setparam!(dev, geometry, "vertex.position", ANARI_ARRAY1D, vtx_array)
-    setparam!(dev, geometry, "primitive.index", ANARI_ARRAY1D, idx_array)
+    setparam!(dev, geometry, "vertex.position", vtx_array)
+    setparam!(dev, geometry, "primitive.index", idx_array)
     commit!(dev, geometry)
 
-    setparam!(dev, surface, "geometry", ANARI_GEOMETRY, geometry)
-    setparam!(dev, surface, "material", ANARI_MATERIAL, material)
+    setparam!(dev, surface, "geometry", geometry)
+    setparam!(dev, surface, "material", material)
     commit!(dev, surface)
 
-    setparam!(dev, group, "surface", ANARI_ARRAY1D, Array1D(dev, [surface]; copy=true))
+    setparam!(dev, group, "surface", Array1D(dev, [surface]; copy=true))
     commit!(dev, group)
 
-    setparam!(dev, instance, "group", ANARI_GROUP, group)
+    setparam!(dev, instance, "group", group)
     commit!(dev, instance)
 
-    setparam!(dev, world, "instance", ANARI_ARRAY1D, Array1D(dev, [instance]; copy=true))
+    setparam!(dev, world, "instance", Array1D(dev, [instance]; copy=true))
     commit!(dev, world)
 
     # 5) Frame setup + synchronous rendering helpers
     frame = Frame(dev)
-    setparam!(dev, frame, "size", ANARI_UINT32_VEC2, (800, 600))
-    setparam!(dev, frame, "camera", ANARI_CAMERA, camera)
-    setparam!(dev, frame, "renderer", ANARI_RENDERER, renderer)
-    setparam!(dev, frame, "world", ANARI_WORLD, world)
+    setparam!(dev, frame, "size",     (UInt32(800), UInt32(600)))
+    setparam!(dev, frame, "camera",   camera)
+    setparam!(dev, frame, "renderer", renderer)
+    setparam!(dev, frame, "world",    world)
     commit!(dev, frame)
 
     render!(dev, frame)
