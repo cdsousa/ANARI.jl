@@ -153,13 +153,11 @@ end
     array = ANARI.new_array1d(dev, input)
     @test array isa ANARI.Array1D{Float32}
     @test array.ptr != C_NULL
+    @test array.length == UInt64(length(input))
 
     data_ptr = ANARI.map_array(dev, array)
-    @test data_ptr isa Ptr{Float32}
-    @test data_ptr != C_NULL
-
-    copied = unsafe_wrap(Vector{Float32}, data_ptr, length(input))
-    @test copied == input
+    @test data_ptr isa Vector{Float32}
+    @test data_ptr == input
 
     ANARI.unmap_array(dev, array)
 
@@ -171,8 +169,9 @@ end
         ANARI.LibANARI.ANARI_FLOAT32,
         UInt64(length(input)),
     )
-    fallback_array = ANARI.Array1D(raw_ptr, dev)
+    fallback_array = ANARI.Array1D(raw_ptr, dev, length(input))
     @test fallback_array isa ANARI.Array1D{Any}
+    @test fallback_array.length == UInt64(length(input))
 
     fallback_ptr = ANARI.map_array(dev, fallback_array)
     @test fallback_ptr isa Ptr{Cvoid}

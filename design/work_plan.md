@@ -49,8 +49,9 @@ This document captures agreed design decisions and a practical implementation pa
 - Plan:
   - Implement helper constructors for 1D (and optionally 2D/3D) arrays that accept Julia arrays, create ANARI array objects, and copy payload.
   - Preserve element type in wrapper handles for Julia-originated arrays via `Array1D{T}`.
+  - Store array element count on `Array1D` handles to support safe/ergonomic mapping.
   - Keep compatibility constructor for externally sourced/unknown-typed handles via `Array1D{Any}`.
-  - Provide typed map behavior: `map_array(device, ::Array1D{T}) -> Ptr{T}`, with fallback `Ptr{Cvoid}` for `Array1D{Any}`.
+  - Provide typed map behavior: `map_array(device, ::Array1D{T}) -> Vector{T}` using stored length metadata, with fallback `Ptr{Cvoid}` for `Array1D{Any}`.
 - Reason: Keeps the initial simple/safe copy model while improving type safety and dispatch for mapping helpers.
 
 8. Rendering/frame API

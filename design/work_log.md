@@ -66,3 +66,8 @@ This file tracks implementation progress in short, chronological entries.
 - *Summary*: Parameterized `Array1D` on element type to preserve payload typing through wrappers; updated array mapping helpers to return typed pointers for `Array1D{T}` and keep a compatibility fallback for unknown element type handles.
 - *Files*: `src/handles.jl`, `src/arrays.jl`, `test/handles_test.jl`, `design/work_log.md`
 - *Notes*: `new_array1d` now returns `Array1D{T}` based on input vector element type; raw-handle constructor remains available and produces `Array1D{Any}` for externally sourced arrays; full test suite passes with `Pkg.test()`.
+
+### Entry 12
+- *Summary*: Added stored element-count metadata on `Array1D` and updated typed mapping to return `Vector{T}` directly using this length, enabling more transparent map usage.
+- *Files*: `src/handles.jl`, `src/arrays.jl`, `test/handles_test.jl`, `design/work_plan.md`, `design/work_log.md`
+- *Notes*: `Array1D` constructors now capture `length`; typed `map_array` returns wrapped vectors while `Array1D{Any}` mapping remains pointer-based fallback; full test suite passes with `Pkg.test()`.
