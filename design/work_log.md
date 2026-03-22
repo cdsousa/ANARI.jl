@@ -36,3 +36,8 @@ This file tracks implementation progress in short, chronological entries.
 - *Summary*: Added frame buffer mapping wrappers `map_frame` and `unmap_frame` with released-handle guards and tuple return `(pixels, width, height, pixel_type)`; added an end-to-end map/unmap test after synchronous rendering.
 - *Files*: `src/handles.jl`, `test/handles_test.jl`, `design/work_log.md`
 - *Notes*: In this environment, mapping the color channel requires explicit `"channel.color"`; some runs report `ANARI_UNKNOWN` pixel type, so tests validate pointer and dimensions without assuming backend metadata.
+
+### Entry 6
+- *Summary*: Refactored rendering/frame-mapping APIs and parameter marshaling/commit APIs into dedicated module files without changing behavior or external API.
+- *Files*: `src/render.jl` (new), `src/parameters.jl` (new), `src/handles.jl`, `src/ANARI.jl`, `design/work_log.md`
+- *Notes*: Kept exports and method signatures stable while separating concerns across handle lifecycle, parameter, and render/frame modules; preserved public API (`setparam!`, `commit!`, inferred `setparam!`) and validated with a full passing `Pkg.test()` run.
