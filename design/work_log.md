@@ -51,3 +51,8 @@ This file tracks implementation progress in short, chronological entries.
 - *Summary*: Added status callback logging bridge and `Library(...; status_logging=true)` constructor path; mapped ANARI severities to Julia logging levels and added tests for level routing.
 - *Files*: `src/status.jl` (new), `src/ANARI.jl`, `src/handles.jl`, `test/status_test.jl` (new), `test/runtests.jl`, `Project.toml`, `design/work_log.md`
 - *Notes*: Callback is installed via `anariLoadLibrary` using a stable `@cfunction` pointer; library now stores callback metadata and clears it on `release!`; full test suite passes with `Pkg.test()`.
+
+### Entry 9
+- *Summary*: Added external `Library(name, callback::Function)` constructor to install user-provided status logging callbacks with safe callback-reference retention.
+- *Files*: `src/status.jl`, `src/handles.jl`, `test/status_test.jl`, `design/work_log.md`
+- *Notes*: User callback supports either `(message)` or `(severity, code, source_type, message)` signatures; callback exceptions are caught and forwarded to Julia logging, then ANARI status is still logged.

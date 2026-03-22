@@ -13,14 +13,16 @@ mutable struct Library <: ANARIHandle
     ptr::LibANARI.ANARILibrary
     status_callback::LibANARI.ANARIStatusCallback
     status_user_data::Ptr{Cvoid}
+    status_user_data_ref::Any
 
     function Library(
         ptr::LibANARI.ANARILibrary,
         status_callback::LibANARI.ANARIStatusCallback=C_NULL,
         status_user_data::Ptr{Cvoid}=C_NULL,
+        status_user_data_ref::Any=nothing,
     )
         _require_nonnull(ptr, "anariLoadLibrary")
-        obj = new(ptr, status_callback, status_user_data)
+        obj = new(ptr, status_callback, status_user_data, status_user_data_ref)
         finalizer(obj) do lib
             try
                 release!(lib)
@@ -145,7 +147,14 @@ end
 function Library(name::AbstractString; status_logging::Bool=false)
     callback_ptr = status_logging ? _STATUS_CALLBACK_PTR : C_NULL
     ptr = LibANARI.anariLoadLibrary(name, callback_ptr, C_NULL)
-    return Library(ptr, callback_ptr, C_NULL)
+    return Library(ptr, callback_ptr, C_NULL, nothing)
+end
+
+function Library(name::AbstractString, status_callback::Function)
+    callback_ref = Ref{Any}(status_callback)
+    user_data_ptr = Base.pointer_from_objref(callback_ref)
+    ptr = LibANARI.anariLoadLibrary(name, _STATUS_CALLBACK_USER_PTR, user_data_ptr)
+    return Library(ptr, _STATUS_CALLBACK_USER_PTR, user_data_ptr, callback_ref)
 end
 
 function Device(library::Library, subtype::AbstractString)
@@ -184,6 +193,7 @@ function release!(library::Library)
     library.ptr = LibANARI.ANARILibrary(C_NULL)
     library.status_callback = LibANARI.ANARIStatusCallback(C_NULL)
     library.status_user_data = C_NULL
+    library.status_user_data_ref = nothing
     return nothing
 end
 
