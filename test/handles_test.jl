@@ -103,3 +103,44 @@ end
     @test_throws ArgumentError ANARI.render!(dev, frame)
     @test_throws ArgumentError ANARI.wait_frame!(dev, frame)
 end
+
+@testset "Handle wrappers frame map and unmap flow" begin
+    lib = ANARI.Library("helide")
+    dev = ANARI.Device(lib, "default")
+
+    renderer = ANARI.Renderer(dev, "default")
+    camera = ANARI.Camera(dev, "default")
+    world = ANARI.World(dev)
+    frame = ANARI.Frame(dev)
+
+    ANARI.setparam!(dev, frame, "size", (UInt32(64), UInt32(64)))
+    ANARI.setparam!(dev, frame, "renderer", renderer)
+    ANARI.setparam!(dev, frame, "camera", camera)
+    ANARI.setparam!(dev, frame, "world", world)
+
+    ANARI.commit!(dev, renderer)
+    ANARI.commit!(dev, camera)
+    ANARI.commit!(dev, world)
+    ANARI.commit!(dev, frame)
+
+    ready = ANARI.render_and_wait!(dev, frame)
+    @test ready != 0
+
+    pixels, width, height, pixel_type = ANARI.map_frame(dev, frame, "channel.color")
+    @test pixels != C_NULL
+    @test width == UInt32(64)
+    @test height == UInt32(64)
+    @test pixel_type isa ANARI.LibANARI.ANARIDataType
+
+    ANARI.unmap_frame(dev, frame, "channel.color")
+
+    ANARI.release!(frame)
+    ANARI.release!(world)
+    ANARI.release!(camera)
+    ANARI.release!(renderer)
+    ANARI.release!(dev)
+    ANARI.release!(lib)
+
+    @test_throws ArgumentError ANARI.map_frame(dev, frame)
+    @test_throws ArgumentError ANARI.unmap_frame(dev, frame)
+end

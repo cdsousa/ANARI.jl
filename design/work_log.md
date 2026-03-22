@@ -31,3 +31,8 @@ This file tracks implementation progress in short, chronological entries.
 - *Summary*: Added synchronous frame helpers `render!`, `wait_frame!`, and `render_and_wait!` with released-handle guards; added an end-to-end wrapper render/wait test using the `helide` backend.
 - *Files*: `src/handles.jl`, `test/handles_test.jl`, `design/work_log.md`
 - *Notes*: Corrected wait-mask keyword default to `ANARIWaitMask(ANARI_WAIT)` to match binding signatures; full test suite passes with `Pkg.test()`.
+
+### Entry 5
+- *Summary*: Added frame buffer mapping wrappers `map_frame` and `unmap_frame` with released-handle guards and tuple return `(pixels, width, height, pixel_type)`; added an end-to-end map/unmap test after synchronous rendering.
+- *Files*: `src/handles.jl`, `test/handles_test.jl`, `design/work_log.md`
+- *Notes*: In this environment, mapping the color channel requires explicit `"channel.color"`; some runs report `ANARI_UNKNOWN` pixel type, so tests validate pointer and dimensions without assuming backend metadata.
