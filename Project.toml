@@ -9,3 +9,9 @@ ANARI_SDK_jll = "b4f1dd5d-d354-485e-8d07-ad6f10ecf726"
 [compat]
 julia = "1.6"
 CEnum = "0.4, 0.5"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
