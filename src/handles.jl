@@ -23,6 +23,52 @@ function _require_nonnull(ptr::Ptr, what::AbstractString)
     return ptr
 end
 
+function _attach_release_finalizer!(obj::ANARIHandle)
+    finalizer(obj) do handle
+        try
+            release!(handle)
+        catch
+            nothing
+        end
+    end
+    return obj
+end
+
+macro define_object_handle(handle_name, ptr_type, create_what)
+    return quote
+        mutable struct $(esc(handle_name)) <: ANARIObjectHandle
+            ptr::$(esc(ptr_type))
+            device::Device
+
+            function $(esc(handle_name))(ptr::$(esc(ptr_type)), device::Device)
+                _require_nonnull(ptr, $create_what)
+                obj = new(ptr, device)
+                return _attach_release_finalizer!(obj)
+            end
+        end
+    end
+end
+
+macro define_device_handle_constructor(handle_name, create_fn)
+    return quote
+        function $(esc(handle_name))(device::Device)
+            _require_live_device(device)
+            ptr = $(esc(create_fn))(device.ptr)
+            return $(esc(handle_name))(ptr, device)
+        end
+    end
+end
+
+macro define_subtyped_device_handle_constructor(handle_name, create_fn)
+    return quote
+        function $(esc(handle_name))(device::Device, subtype::AbstractString)
+            _require_live_device(device)
+            ptr = $(esc(create_fn))(device.ptr, subtype)
+            return $(esc(handle_name))(ptr, device)
+        end
+    end
+end
+
 mutable struct Library <: ANARIHandle
     ptr::LibANARI.ANARILibrary
     status_callback::LibANARI.ANARIStatusCallback
@@ -37,15 +83,13 @@ mutable struct Library <: ANARIHandle
     )
         _require_nonnull(ptr, "anariLoadLibrary")
         obj = new(ptr, status_callback, status_user_data, status_user_data_ref)
-        finalizer(obj) do lib
-            try
-                release!(lib)
-            catch
-                nothing
-            end
-        end
-        return obj
+        return _attach_release_finalizer!(obj)
     end
+end
+
+function _require_live_library(library::Library)
+    _isnull(library.ptr) && throw(ArgumentError("library handle has already been released"))
+    return library
 end
 
 mutable struct Device <: ANARIHandle
@@ -55,198 +99,27 @@ mutable struct Device <: ANARIHandle
     function Device(ptr::LibANARI.ANARIDevice, library::Library)
         _require_nonnull(ptr, "anariNewDevice")
         obj = new(ptr, library)
-        finalizer(obj) do dev
-            try
-                release!(dev)
-            catch
-                nothing
-            end
-        end
-        return obj
+        return _attach_release_finalizer!(obj)
     end
+end
+
+function _require_live_device(device::Device)
+    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
+    return device
 end
 
 abstract type ANARIObjectHandle <: ANARIHandle end
 
-mutable struct World <: ANARIObjectHandle
-    ptr::LibANARI.ANARIWorld
-    device::Device
-
-    function World(ptr::LibANARI.ANARIWorld, device::Device)
-        _require_nonnull(ptr, "anariNewWorld")
-        obj = new(ptr, device)
-        finalizer(obj) do world
-            try
-                release!(world)
-            catch
-                nothing
-            end
-        end
-        return obj
-    end
-end
-
-mutable struct Frame <: ANARIObjectHandle
-    ptr::LibANARI.ANARIFrame
-    device::Device
-
-    function Frame(ptr::LibANARI.ANARIFrame, device::Device)
-        _require_nonnull(ptr, "anariNewFrame")
-        obj = new(ptr, device)
-        finalizer(obj) do frame
-            try
-                release!(frame)
-            catch
-                nothing
-            end
-        end
-        return obj
-    end
-end
-
-mutable struct Camera <: ANARIObjectHandle
-    ptr::LibANARI.ANARICamera
-    device::Device
-
-    function Camera(ptr::LibANARI.ANARICamera, device::Device)
-        _require_nonnull(ptr, "anariNewCamera")
-        obj = new(ptr, device)
-        finalizer(obj) do camera
-            try
-                release!(camera)
-            catch
-                nothing
-            end
-        end
-        return obj
-    end
-end
-
-mutable struct Renderer <: ANARIObjectHandle
-    ptr::LibANARI.ANARIRenderer
-    device::Device
-
-    function Renderer(ptr::LibANARI.ANARIRenderer, device::Device)
-        _require_nonnull(ptr, "anariNewRenderer")
-        obj = new(ptr, device)
-        finalizer(obj) do renderer
-            try
-                release!(renderer)
-            catch
-                nothing
-            end
-        end
-        return obj
-    end
-end
-
-mutable struct Geometry <: ANARIObjectHandle
-    ptr::LibANARI.ANARIGeometry
-    device::Device
-
-    function Geometry(ptr::LibANARI.ANARIGeometry, device::Device)
-        _require_nonnull(ptr, "anariNewGeometry")
-        obj = new(ptr, device)
-        finalizer(obj) do geometry
-            try
-                release!(geometry)
-            catch
-                nothing
-            end
-        end
-        return obj
-    end
-end
-
-mutable struct Material <: ANARIObjectHandle
-    ptr::LibANARI.ANARIMaterial
-    device::Device
-
-    function Material(ptr::LibANARI.ANARIMaterial, device::Device)
-        _require_nonnull(ptr, "anariNewMaterial")
-        obj = new(ptr, device)
-        finalizer(obj) do material
-            try
-                release!(material)
-            catch
-                nothing
-            end
-        end
-        return obj
-    end
-end
-
-mutable struct Surface <: ANARIObjectHandle
-    ptr::LibANARI.ANARISurface
-    device::Device
-
-    function Surface(ptr::LibANARI.ANARISurface, device::Device)
-        _require_nonnull(ptr, "anariNewSurface")
-        obj = new(ptr, device)
-        finalizer(obj) do surface
-            try
-                release!(surface)
-            catch
-                nothing
-            end
-        end
-        return obj
-    end
-end
-
-mutable struct Group <: ANARIObjectHandle
-    ptr::LibANARI.ANARIGroup
-    device::Device
-
-    function Group(ptr::LibANARI.ANARIGroup, device::Device)
-        _require_nonnull(ptr, "anariNewGroup")
-        obj = new(ptr, device)
-        finalizer(obj) do group
-            try
-                release!(group)
-            catch
-                nothing
-            end
-        end
-        return obj
-    end
-end
-
-mutable struct Instance <: ANARIObjectHandle
-    ptr::LibANARI.ANARIInstance
-    device::Device
-
-    function Instance(ptr::LibANARI.ANARIInstance, device::Device)
-        _require_nonnull(ptr, "anariNewInstance")
-        obj = new(ptr, device)
-        finalizer(obj) do instance
-            try
-                release!(instance)
-            catch
-                nothing
-            end
-        end
-        return obj
-    end
-end
-
-mutable struct Light <: ANARIObjectHandle
-    ptr::LibANARI.ANARILight
-    device::Device
-
-    function Light(ptr::LibANARI.ANARILight, device::Device)
-        _require_nonnull(ptr, "anariNewLight")
-        obj = new(ptr, device)
-        finalizer(obj) do light
-            try
-                release!(light)
-            catch
-                nothing
-            end
-        end
-        return obj
-    end
-end
+@define_object_handle World LibANARI.ANARIWorld "anariNewWorld"
+@define_object_handle Frame LibANARI.ANARIFrame "anariNewFrame"
+@define_object_handle Camera LibANARI.ANARICamera "anariNewCamera"
+@define_object_handle Renderer LibANARI.ANARIRenderer "anariNewRenderer"
+@define_object_handle Geometry LibANARI.ANARIGeometry "anariNewGeometry"
+@define_object_handle Material LibANARI.ANARIMaterial "anariNewMaterial"
+@define_object_handle Surface LibANARI.ANARISurface "anariNewSurface"
+@define_object_handle Group LibANARI.ANARIGroup "anariNewGroup"
+@define_object_handle Instance LibANARI.ANARIInstance "anariNewInstance"
+@define_object_handle Light LibANARI.ANARILight "anariNewLight"
 
 mutable struct Array1D{T} <: ANARIObjectHandle
     ptr::LibANARI.ANARIArray1D
@@ -257,14 +130,7 @@ mutable struct Array1D{T} <: ANARIObjectHandle
         _require_nonnull(ptr, "anariNewArray1D")
         length < 0 && throw(ArgumentError("array length must be non-negative"))
         obj = new{T}(ptr, device, UInt64(length))
-        finalizer(obj) do array
-            try
-                release!(array)
-            catch
-                nothing
-            end
-        end
-        return obj
+        return _attach_release_finalizer!(obj)
     end
 end
 
@@ -286,70 +152,21 @@ function Library(name::AbstractString, status_callback::Function)
 end
 
 function Device(library::Library, subtype::AbstractString)
-    _isnull(library.ptr) && throw(ArgumentError("library handle has already been released"))
+    _require_live_library(library)
     ptr = LibANARI.anariNewDevice(library.ptr, subtype)
     return Device(ptr, library)
 end
 
-function World(device::Device)
-    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
-    ptr = LibANARI.anariNewWorld(device.ptr)
-    return World(ptr, device)
-end
-
-function Frame(device::Device)
-    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
-    ptr = LibANARI.anariNewFrame(device.ptr)
-    return Frame(ptr, device)
-end
-
-function Camera(device::Device, subtype::AbstractString)
-    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
-    ptr = LibANARI.anariNewCamera(device.ptr, subtype)
-    return Camera(ptr, device)
-end
-
-function Renderer(device::Device, subtype::AbstractString)
-    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
-    ptr = LibANARI.anariNewRenderer(device.ptr, subtype)
-    return Renderer(ptr, device)
-end
-
-function Geometry(device::Device, subtype::AbstractString)
-    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
-    ptr = LibANARI.anariNewGeometry(device.ptr, subtype)
-    return Geometry(ptr, device)
-end
-
-function Material(device::Device, subtype::AbstractString)
-    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
-    ptr = LibANARI.anariNewMaterial(device.ptr, subtype)
-    return Material(ptr, device)
-end
-
-function Surface(device::Device)
-    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
-    ptr = LibANARI.anariNewSurface(device.ptr)
-    return Surface(ptr, device)
-end
-
-function Group(device::Device)
-    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
-    ptr = LibANARI.anariNewGroup(device.ptr)
-    return Group(ptr, device)
-end
-
-function Instance(device::Device, subtype::AbstractString)
-    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
-    ptr = LibANARI.anariNewInstance(device.ptr, subtype)
-    return Instance(ptr, device)
-end
-
-function Light(device::Device, subtype::AbstractString)
-    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
-    ptr = LibANARI.anariNewLight(device.ptr, subtype)
-    return Light(ptr, device)
-end
+@define_device_handle_constructor World LibANARI.anariNewWorld
+@define_device_handle_constructor Frame LibANARI.anariNewFrame
+@define_subtyped_device_handle_constructor Camera LibANARI.anariNewCamera
+@define_subtyped_device_handle_constructor Renderer LibANARI.anariNewRenderer
+@define_subtyped_device_handle_constructor Geometry LibANARI.anariNewGeometry
+@define_subtyped_device_handle_constructor Material LibANARI.anariNewMaterial
+@define_device_handle_constructor Surface LibANARI.anariNewSurface
+@define_device_handle_constructor Group LibANARI.anariNewGroup
+@define_subtyped_device_handle_constructor Instance LibANARI.anariNewInstance
+@define_subtyped_device_handle_constructor Light LibANARI.anariNewLight
 
 function release!(library::Library)
     _isnull(library.ptr) && return nothing

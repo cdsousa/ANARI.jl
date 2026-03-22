@@ -76,3 +76,8 @@ This file tracks implementation progress in short, chronological entries.
 - *Summary*: Added first-class scene object wrappers `Geometry`, `Material`, `Surface`, `Group`, `Instance`, and `Light` with constructor guards, finalizers, and idempotent release behavior; added scene-chain tests and expanded object-array support in `new_array1d` for vectors of wrapper handles.
 - *Files*: `src/handles.jl`, `src/parameters.jl`, `src/arrays.jl`, `src/anari_type.jl`, `test/handles_test.jl`, `test/anari_type_test.jl`, `design/work_log.md`
 - *Notes*: Extended object dtype handling to include scene objects and `ANARI_ARRAY1D`; added `anari_type(::Type{<:Array1D})` for inferred array parameter typing; full test suite passes with `Pkg.test()`.
+
+### Entry 14
+- *Summary*: Refactored repeated handle boilerplate in `handles.jl` by centralizing finalizer attachment and live-handle guards, and by generating repeated object-wrapper and device-constructor patterns with macros.
+- *Files*: `src/handles.jl`, `design/work_log.md`
+- *Notes*: Public API and lifecycle semantics were preserved while reducing duplication; validated with a full passing `Pkg.test()` run.
