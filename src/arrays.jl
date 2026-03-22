@@ -14,7 +14,7 @@ function new_array1d(device::Device, data::AbstractVector{T}) where {T}
         dtype,
         UInt64(length(values)),
     )
-    array = Array1D(ptr, device)
+    array = Array1D{T}(ptr, device, length(values))
 
     mapped = LibANARI.anariMapArray(device.ptr, array.ptr)
     _isnull(mapped) && throw(ErrorException("anariMapArray returned a null data pointer"))
@@ -28,13 +28,22 @@ function new_array1d(device::Device, data::AbstractVector{T}) where {T}
     return array
 end
 
-function map_array(device::Device, array::Array1D)
+function map_array(device::Device, array::Array1D{Any})
     _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
     _isnull(array.ptr) && throw(ArgumentError("array handle has already been released"))
 
     data_ptr = LibANARI.anariMapArray(device.ptr, array.ptr)
     _isnull(data_ptr) && throw(ErrorException("anariMapArray returned a null data pointer"))
     return data_ptr
+end
+
+function map_array(device::Device, array::Array1D{T}) where {T}
+    _isnull(device.ptr) && throw(ArgumentError("device handle has already been released"))
+    _isnull(array.ptr) && throw(ArgumentError("array handle has already been released"))
+
+    data_ptr = LibANARI.anariMapArray(device.ptr, array.ptr)
+    _isnull(data_ptr) && throw(ErrorException("anariMapArray returned a null data pointer"))
+    return unsafe_wrap(Vector{T}, Ptr{T}(data_ptr), Int(array.length))
 end
 
 function unmap_array(device::Device, array::Array1D)

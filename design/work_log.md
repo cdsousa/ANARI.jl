@@ -61,3 +61,8 @@ This file tracks implementation progress in short, chronological entries.
 - *Summary*: Added a full throwaway rendering sample that generates three 1920x1080 PNG images (90-degree rotation per image) with side-by-side triangles; documented wrapper API gaps exposed by the sample and renamed the throwaway workspace folder from `examples/` to `experiments/`.
 - *Files*: `experiments/triangle_gallery/run.jl`, `experiments/triangle_gallery/Project.toml`, `experiments/triangle_gallery/Manifest.toml`, `experiments/triangle_gallery/README.md`, `experiments/triangle_gallery/gap.md`, `experiments/triangle_gallery/output/triangles_01_0deg.png`, `experiments/triangle_gallery/output/triangles_02_90deg.png`, `experiments/triangle_gallery/output/triangles_03_180deg.png`, `design/work_log.md`
 - *Notes*: Gap analysis confirms current wrapper limitations around scene-object wrappers and broader parameter marshalling; generated PNGs were validated after background-color handling adjustments for this backend.
+
+### Entry 11
+- *Summary*: Parameterized `Array1D` on element type to preserve payload typing through wrappers; updated array mapping helpers to return typed pointers for `Array1D{T}` and keep a compatibility fallback for unknown element type handles.
+- *Files*: `src/handles.jl`, `src/arrays.jl`, `test/handles_test.jl`, `design/work_log.md`
+- *Notes*: `new_array1d` now returns `Array1D{T}` based on input vector element type; raw-handle constructor remains available and produces `Array1D{Any}` for externally sourced arrays; full test suite passes with `Pkg.test()`.

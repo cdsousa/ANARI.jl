@@ -126,13 +126,15 @@ mutable struct Renderer <: ANARIObjectHandle
     end
 end
 
-mutable struct Array1D <: ANARIObjectHandle
+mutable struct Array1D{T} <: ANARIObjectHandle
     ptr::LibANARI.ANARIArray1D
     device::Device
+    length::UInt64
 
-    function Array1D(ptr::LibANARI.ANARIArray1D, device::Device)
+    function Array1D{T}(ptr::LibANARI.ANARIArray1D, device::Device, length::Integer) where {T}
         _require_nonnull(ptr, "anariNewArray1D")
-        obj = new(ptr, device)
+        length < 0 && throw(ArgumentError("array length must be non-negative"))
+        obj = new{T}(ptr, device, UInt64(length))
         finalizer(obj) do array
             try
                 release!(array)
@@ -142,6 +144,10 @@ mutable struct Array1D <: ANARIObjectHandle
         end
         return obj
     end
+end
+
+function Array1D(ptr::LibANARI.ANARIArray1D, device::Device, length::Integer=0)
+    return Array1D{Any}(ptr, device, length)
 end
 
 function Library(name::AbstractString; status_logging::Bool=false)

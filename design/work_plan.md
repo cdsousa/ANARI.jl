@@ -13,6 +13,7 @@ This document captures agreed design decisions and a practical implementation pa
 1. Handle type representation
 - Chosen: Abstract type hierarchy + concrete subtypes.
 - Plan: Define `abstract type ANARIHandle end` and concrete mutable wrapper types like `Library`, `Device`, `World`, `Frame`, etc.
+- Update: Allow targeted parameterization where it materially improves safety/ergonomics; specifically `Array1D{T}` preserves element type for Julia-created arrays.
 - Reason: Clear dispatch boundaries and idiomatic Julia type structure.
 
 2. Memory management
@@ -45,8 +46,12 @@ This document captures agreed design decisions and a practical implementation pa
 
 7. Array API
 - Chosen: Thin helper that copies memory to ANARI-owned side.
-- Plan: Implement helper constructors for 1D (and optionally 2D/3D) arrays that accept Julia arrays, create ANARI array objects, and copy payload.
-- Reason: Simple and safe lifetime model for first iteration.
+- Plan:
+  - Implement helper constructors for 1D (and optionally 2D/3D) arrays that accept Julia arrays, create ANARI array objects, and copy payload.
+  - Preserve element type in wrapper handles for Julia-originated arrays via `Array1D{T}`.
+  - Keep compatibility constructor for externally sourced/unknown-typed handles via `Array1D{Any}`.
+  - Provide typed map behavior: `map_array(device, ::Array1D{T}) -> Ptr{T}`, with fallback `Ptr{Cvoid}` for `Array1D{Any}`.
+- Reason: Keeps the initial simple/safe copy model while improving type safety and dispatch for mapping helpers.
 
 8. Rendering/frame API
 - Chosen: Synchronous helper.
@@ -58,6 +63,7 @@ This document captures agreed design decisions and a practical implementation pa
 1. Handle representation alternatives
 - Rejected: Single parametric `Handle{T}`.
 - Why rejected: Less readable API and weaker semantic type identities for end users.
+- Clarification: Selective handle parameterization (for example `Array1D{T}`) is acceptable when it carries meaningful payload typing without replacing semantic handle names.
 
 2. Memory management alternatives
 - Rejected: Manual release only.
