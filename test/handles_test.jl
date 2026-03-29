@@ -123,6 +123,33 @@ end
     @test_throws ArgumentError ANARI.Light(dev, "directional")
 end
 
+@testset "Handle wrappers sampler, spatial field, and volume constructors" begin
+    lib = ANARI.Library("helide")
+    dev = ANARI.Device(lib, "default")
+
+    sampler = ANARI.Sampler(dev, "transform")
+    field = ANARI.SpatialField(dev, "structuredRegular")
+    volume = ANARI.Volume(dev, "transferFunction1D")
+
+    @test sampler.ptr != C_NULL
+    @test field.ptr != C_NULL
+    @test volume.ptr != C_NULL
+
+    ANARI.commit!(dev, sampler)
+    ANARI.commit!(dev, field)
+    ANARI.commit!(dev, volume)
+
+    ANARI.release!(volume)
+    ANARI.release!(field)
+    ANARI.release!(sampler)
+    ANARI.release!(dev)
+    ANARI.release!(lib)
+
+    @test_throws ArgumentError ANARI.Sampler(dev, "transform")
+    @test_throws ArgumentError ANARI.SpatialField(dev, "structuredRegular")
+    @test_throws ArgumentError ANARI.Volume(dev, "transferFunction1D")
+end
+
 @testset "Handle wrappers render and wait flow" begin
     lib = ANARI.Library("helide")
     dev = ANARI.Device(lib, "default")

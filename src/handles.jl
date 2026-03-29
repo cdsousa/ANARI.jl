@@ -11,6 +11,9 @@ export ANARIHandle,
        Group,
        Instance,
        Light,
+       Sampler,
+       SpatialField,
+       Volume,
        Array1D,
        release!
 
@@ -120,6 +123,9 @@ abstract type ANARIObjectHandle <: ANARIHandle end
 @define_object_handle Group LibANARI.ANARIGroup "anariNewGroup"
 @define_object_handle Instance LibANARI.ANARIInstance "anariNewInstance"
 @define_object_handle Light LibANARI.ANARILight "anariNewLight"
+@define_object_handle Sampler LibANARI.ANARISampler "anariNewSampler"
+@define_object_handle SpatialField LibANARI.ANARISpatialField "anariNewSpatialField"
+@define_object_handle Volume LibANARI.ANARIVolume "anariNewVolume"
 
 mutable struct Array1D{T} <: ANARIObjectHandle
     ptr::LibANARI.ANARIArray1D
@@ -167,6 +173,9 @@ end
 @define_device_handle_constructor Group LibANARI.anariNewGroup
 @define_subtyped_device_handle_constructor Instance LibANARI.anariNewInstance
 @define_subtyped_device_handle_constructor Light LibANARI.anariNewLight
+@define_subtyped_device_handle_constructor Sampler LibANARI.anariNewSampler
+@define_subtyped_device_handle_constructor SpatialField LibANARI.anariNewSpatialField
+@define_subtyped_device_handle_constructor Volume LibANARI.anariNewVolume
 
 function release!(library::Library)
     _isnull(library.ptr) && return nothing

@@ -21,7 +21,10 @@ function _check_object_dtype(dtype::LibANARI.ANARIDataType)
         LibANARI.ANARI_LIGHT,
         LibANARI.ANARI_MATERIAL,
         LibANARI.ANARI_RENDERER,
+        LibANARI.ANARI_SAMPLER,
+        LibANARI.ANARI_SPATIAL_FIELD,
         LibANARI.ANARI_SURFACE,
+        LibANARI.ANARI_VOLUME,
         LibANARI.ANARI_WORLD,
     )
 end

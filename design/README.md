@@ -8,10 +8,10 @@ This package supposes that Julia 1.12 is installed and the ANARI_SDK_jll package
 
 ## Contents
 
-- `work_plan.md`: Main implementation/design plan for the idiomatic Julia wrapper layer.
-- `work_plan_sample.jl`: Small code-oriented sample used while shaping the plan.
-- `work_log.md`: Chronological log of implementation progress, with summaries and notes.
-- `ai_chats/`: Archived transcript produced during AI-assisted design discussions.
+- [work_plan.md](work_plan.md): Main implementation/design plan for the idiomatic Julia wrapper layer.
+- [work_plan_sample.jl](work_plan_sample.jl): Small code-oriented sample used while shaping the plan.
+- [work_log.md](work_log.md): Chronological log of implementation progress, with summaries and notes.
+- [ai_chats/](ai_chats/): Archived transcript produced during AI-assisted design discussions.
 
 ## Purpose
 

@@ -81,3 +81,8 @@ This file tracks implementation progress in short, chronological entries.
 - *Summary*: Refactored repeated handle boilerplate in `handles.jl` by centralizing finalizer attachment and live-handle guards, and by generating repeated object-wrapper and device-constructor patterns with macros.
 - *Files*: `src/handles.jl`, `design/work_log.md`
 - *Notes*: Public API and lifecycle semantics were preserved while reducing duplication; validated with a full passing `Pkg.test()` run.
+
+### Entry 15
+- *Summary*: Added first-class object wrappers `Sampler`, `SpatialField`, and `Volume` (subtype constructors, finalizers, idempotent `release!`); extended `setparam!` object dtypes and `anari_type` dispatch; added helide-backed constructor/commit tests and trait tests.
+- *Files*: `src/handles.jl`, `src/parameters.jl`, `src/anari_type.jl`, `test/handles_test.jl`, `test/anari_type_test.jl`, `design/work_log.md`
+- *Notes*: Helide subtypes used in tests: `transform` (sampler), `structuredRegular` (spatial field), `transferFunction1D` (volume). Run `Pkg.test()` where `ANARI_SDK_jll` resolves (local manifest or registered env).

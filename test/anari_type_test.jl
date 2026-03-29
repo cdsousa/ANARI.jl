@@ -26,6 +26,9 @@
     @test ANARI.anari_type(ANARI.Group)    == L.ANARI_GROUP
     @test ANARI.anari_type(ANARI.Instance) == L.ANARI_INSTANCE
     @test ANARI.anari_type(ANARI.Light)    == L.ANARI_LIGHT
+    @test ANARI.anari_type(ANARI.Sampler)       == L.ANARI_SAMPLER
+    @test ANARI.anari_type(ANARI.SpatialField)  == L.ANARI_SPATIAL_FIELD
+    @test ANARI.anari_type(ANARI.Volume)        == L.ANARI_VOLUME
 end
 
 @testset "setparam! inferred dtype" begin
