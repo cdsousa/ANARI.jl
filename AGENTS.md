@@ -1,0 +1,1 @@
+Development documentation and instructions starting point is provided in [design/README.md](design/README.md).
