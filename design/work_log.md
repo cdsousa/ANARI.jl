@@ -86,3 +86,8 @@ This file tracks implementation progress in short, chronological entries.
 - *Summary*: Added first-class object wrappers `Sampler`, `SpatialField`, and `Volume` (subtype constructors, finalizers, idempotent `release!`); extended `setparam!` object dtypes and `anari_type` dispatch; added helide-backed constructor/commit tests and trait tests.
 - *Files*: `src/handles.jl`, `src/parameters.jl`, `src/anari_type.jl`, `test/handles_test.jl`, `test/anari_type_test.jl`, `design/work_log.md`
 - *Notes*: Helide subtypes used in tests: `transform` (sampler), `structuredRegular` (spatial field), `transferFunction1D` (volume). Run `Pkg.test()` where `ANARI_SDK_jll` resolves (local manifest or registered env).
+
+### Entry 16
+- *Summary*: Made `Array1D` a non-parametric concrete type again (aligned with ANARI’s runtime array typing); store Julia-side element interpretation in field `eltype::Type` (default `Any`); `Base.eltype` forwards to that field; unified `map_array` on `eltype === Any` vs concrete type; `anari_type(::Type{Array1D})` for inferred parameters; updated design docs and sample.
+- *Files*: `src/handles.jl`, `src/arrays.jl`, `src/anari_type.jl`, `test/handles_test.jl`, `test/anari_type_test.jl`, `design/work_plan.md`, `design/work_log.md`, `design/work_plan_sample.jl`
+- *Notes*: Supersedes the `Array1D{T}` / `Array1D{Any}` split described in Entries 11–12; Entry 13’s `anari_type` hook is now `Type{Array1D}` only. Field was named `element_type` briefly, then `eltype`.

@@ -127,21 +127,32 @@ abstract type ANARIObjectHandle <: ANARIHandle end
 @define_object_handle SpatialField LibANARI.ANARISpatialField "anariNewSpatialField"
 @define_object_handle Volume LibANARI.ANARIVolume "anariNewVolume"
 
-mutable struct Array1D{T} <: ANARIObjectHandle
+"""
+    Array1D
+
+Wrapper for an `ANARIArray1D` handle. Unlike a Julia `Array{T}`, this type is not parameterized: ANARI fixes element
+datatype and length at runtime. The wrapper stores `length::UInt64` and `eltype::Type`, where `eltype` is the Julia
+type used to view mapped data (see `map_array`) or `Any` when unknown (for example arrays built from a raw pointer).
+`new_array1d` sets `eltype` from the source vector’s element type, or `LibANARI.ANARIObject` for vectors of object
+handles. `Base.eltype(::Array1D)` returns the `eltype` field.
+"""
+mutable struct Array1D <: ANARIObjectHandle
     ptr::LibANARI.ANARIArray1D
     device::Device
     length::UInt64
+    eltype::Type
 
-    function Array1D{T}(ptr::LibANARI.ANARIArray1D, device::Device, length::Integer) where {T}
+    function Array1D(
+        ptr::LibANARI.ANARIArray1D,
+        device::Device,
+        length::Integer = 0,
+        eltype::Type = Any,
+    )
         _require_nonnull(ptr, "anariNewArray1D")
         length < 0 && throw(ArgumentError("array length must be non-negative"))
-        obj = new{T}(ptr, device, UInt64(length))
+        obj = new(ptr, device, UInt64(length), eltype)
         return _attach_release_finalizer!(obj)
     end
-end
-
-function Array1D(ptr::LibANARI.ANARIArray1D, device::Device, length::Integer=0)
-    return Array1D{Any}(ptr, device, length)
 end
 
 function Library(name::AbstractString; status_logging::Bool=false)

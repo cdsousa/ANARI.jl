@@ -235,7 +235,8 @@ end
 
     input = Float32[1, 2, 3, 5, 8]
     array = ANARI.new_array1d(dev, input)
-    @test array isa ANARI.Array1D{Float32}
+    @test array isa ANARI.Array1D
+    @test eltype(array) === Float32
     @test array.ptr != C_NULL
     @test array.length == UInt64(length(input))
 
@@ -254,7 +255,8 @@ end
         UInt64(length(input)),
     )
     fallback_array = ANARI.Array1D(raw_ptr, dev, length(input))
-    @test fallback_array isa ANARI.Array1D{Any}
+    @test fallback_array isa ANARI.Array1D
+    @test eltype(fallback_array) === Any
     @test fallback_array.length == UInt64(length(input))
 
     fallback_ptr = ANARI.map_array(dev, fallback_array)

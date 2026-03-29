@@ -13,8 +13,8 @@ This document captures agreed design decisions and a practical implementation pa
 1. Handle type representation
 - Chosen: Abstract type hierarchy + concrete subtypes.
 - Plan: Define `abstract type ANARIHandle end` and concrete mutable wrapper types like `Library`, `Device`, `World`, `Frame`, etc.
-- Update: Allow targeted parameterization where it materially improves safety/ergonomics; specifically `Array1D{T}` preserves element type for Julia-created arrays.
-- Reason: Clear dispatch boundaries and idiomatic Julia type structure.
+- Update: Semantic handles stay non-parametric; `Array1D` is a single concrete type aligned with ANARI (element datatype and length are runtime). Julia-side interpretation of mapped memory is recorded in an `eltype::Type` field (default `Any` when unknown), exposed also via `Base.eltype`.
+- Reason: Clear dispatch boundaries; array payload typing matches ANARI’s runtime model instead of Julia type parameters.
 
 2. Memory management
 - Chosen: Mutable handle types with finalizer attached in inner constructor.
@@ -47,12 +47,13 @@ This document captures agreed design decisions and a practical implementation pa
 7. Array API
 - Chosen: Thin helper that copies memory to ANARI-owned side.
 - Plan:
-  - Implement helper constructors for 1D (and optionally 2D/3D) arrays that accept Julia arrays, create ANARI array objects, and copy payload.
-  - Preserve element type in wrapper handles for Julia-originated arrays via `Array1D{T}`.
-  - Store array element count on `Array1D` handles to support safe/ergonomic mapping.
-  - Keep compatibility constructor for externally sourced/unknown-typed handles via `Array1D{Any}`.
-  - Provide typed map behavior: `map_array(device, ::Array1D{T}) -> Vector{T}` using stored length metadata, with fallback `Ptr{Cvoid}` for `Array1D{Any}`.
-- Reason: Keeps the initial simple/safe copy model while improving type safety and dispatch for mapping helpers.
+  - Implement helper `new_array1d` for 1D (and optionally 2D/3D later) arrays that accept Julia vectors, create ANARI array objects, and copy payload.
+  - `Array1D` is not parameterized: it stores `length::UInt64` and `eltype::Type` (Julia element type used for `unsafe_wrap` when mapping, or `Any` if unknown).
+  - `new_array1d` sets `eltype` from the vector’s element type for primitive data, and to `LibANARI.ANARIObject` for vectors of object handles.
+  - Raw-pointer constructor `Array1D(ptr, device, length=0, eltype=Any)` wraps arrays created outside the helper (unknown layout → `eltype` stays `Any`).
+  - `map_array(device, array)` returns `Vector{array.eltype}` when `eltype !== Any`, otherwise `Ptr{Cvoid}`; length comes from the stored `length` field.
+  - `Base.eltype(::Array1D)` forwards to the `eltype` field. Inferred `setparam!` uses `anari_type(Array1D)` for `ANARI_ARRAY1D`.
+- Reason: Keeps the simple copy model while reflecting ANARI’s runtime typing and still supporting ergonomic typed views when `eltype` is known.
 
 8. Rendering/frame API
 - Chosen: Synchronous helper.
@@ -64,7 +65,7 @@ This document captures agreed design decisions and a practical implementation pa
 1. Handle representation alternatives
 - Rejected: Single parametric `Handle{T}`.
 - Why rejected: Less readable API and weaker semantic type identities for end users.
-- Clarification: Selective handle parameterization (for example `Array1D{T}`) is acceptable when it carries meaningful payload typing without replacing semantic handle names.
+- Note: `Array1D` also avoids type-parameter payload typing; optional Julia-side element typing lives in the `eltype` field instead.
 
 2. Memory management alternatives
 - Rejected: Manual release only.

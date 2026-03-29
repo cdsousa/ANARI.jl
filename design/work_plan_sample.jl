@@ -65,9 +65,9 @@ function sample_usage()
     wait_ready!(dev, frame)  # internally uses ANARI_WAIT
 
     # 6) Map frame channel (color) and consume image data
-    pixels, width, height, pixel_type = map_frame(dev, frame, "color")
+    pixels, width, height, pixel_type = map_frame(dev, frame, "channel.color")
     # ... consume pixels ...
-    unmap_frame(dev, frame, "color")
+    unmap_frame(dev, frame, "channel.color")
 
     # 7) Manual release remains available and idempotent
     release!(frame)

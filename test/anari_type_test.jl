@@ -29,6 +29,7 @@
     @test ANARI.anari_type(ANARI.Sampler)       == L.ANARI_SAMPLER
     @test ANARI.anari_type(ANARI.SpatialField)  == L.ANARI_SPATIAL_FIELD
     @test ANARI.anari_type(ANARI.Volume)        == L.ANARI_VOLUME
+    @test ANARI.anari_type(ANARI.Array1D)       == L.ANARI_ARRAY1D
 end
 
 @testset "setparam! inferred dtype" begin
