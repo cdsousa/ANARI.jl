@@ -1,6 +1,10 @@
 @testset "anari_type trait" begin
     L = ANARI.LibANARI
 
+    # String type
+    @test ANARI.anari_type(String)    == L.ANARI_STRING
+    @test ANARI.anari_type(SubString{String}) == L.ANARI_STRING
+
     # Scalar types
     @test ANARI.anari_type(Bool)    == L.ANARI_BOOL
     @test ANARI.anari_type(Int32)   == L.ANARI_INT32
@@ -56,6 +60,9 @@ end
     ANARI.commit!(dev, camera)
     ANARI.commit!(dev, world)
     ANARI.commit!(dev, frame)
+
+    # Inferred from String
+    ANARI.setparam!(dev, frame, "channel.color", "color")
 
     # Unsupported type raises MethodError (no anari_type method defined)
     @test_throws MethodError ANARI.setparam!(dev, frame, "size", (32, 32))

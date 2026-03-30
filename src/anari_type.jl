@@ -9,6 +9,9 @@ Downstream packages can extend this function to add support for additional types
 """
 function anari_type end
 
+# String type
+anari_type(::Type{<:AbstractString}) = LibANARI.ANARI_STRING
+
 # Scalar types
 anari_type(::Type{Bool})    = LibANARI.ANARI_BOOL
 anari_type(::Type{Int32})   = LibANARI.ANARI_INT32

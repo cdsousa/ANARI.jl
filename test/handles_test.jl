@@ -39,6 +39,7 @@ end
 
     size = (UInt32(64), UInt32(64))
     ANARI.setparam!(dev, frame, "size", ANARI.LibANARI.ANARI_UINT32_VEC2, size)
+    ANARI.setparam!(dev, frame, "channel.color", ANARI.LibANARI.ANARI_STRING, "color")
     ANARI.setparam!(dev, frame, "renderer", ANARI.LibANARI.ANARI_RENDERER, renderer)
     ANARI.setparam!(dev, frame, "camera", ANARI.LibANARI.ANARI_CAMERA, camera)
     ANARI.setparam!(dev, frame, "world", ANARI.LibANARI.ANARI_WORLD, world)

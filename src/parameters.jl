@@ -32,7 +32,9 @@ function _check_object_dtype(dtype::LibANARI.ANARIDataType)
 end
 
 function _prepare_parameter_ref(dtype::LibANARI.ANARIDataType, value)
-    if dtype == LibANARI.ANARI_BOOL
+    if dtype == LibANARI.ANARI_STRING
+        return Ref{Cstring}(Base.unsafe_convert(Cstring, String(value)))
+    elseif dtype == LibANARI.ANARI_BOOL
         return Ref{UInt32}(value ? 1 : 0)
     elseif dtype == LibANARI.ANARI_INT32
         return Ref{Int32}(Int32(value))
@@ -81,7 +83,7 @@ function setparam!(
     _isnull(object_ptr) && throw(ArgumentError("target object handle has already been released"))
 
     value_ref = _prepare_parameter_ref(dtype, value)
-    GC.@preserve value_ref begin
+    GC.@preserve value value_ref begin
         LibANARI.anariSetParameter(
             device.ptr,
             object_ptr,
