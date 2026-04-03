@@ -91,3 +91,8 @@ This file tracks implementation progress in short, chronological entries.
 - *Summary*: Made `Array1D` a non-parametric concrete type again (aligned with ANARI’s runtime array typing); store Julia-side element interpretation in field `eltype::Type` (default `Any`); `Base.eltype` forwards to that field; unified `map_array` on `eltype === Any` vs concrete type; `anari_type(::Type{Array1D})` for inferred parameters; updated design docs and sample.
 - *Files*: `src/handles.jl`, `src/arrays.jl`, `src/anari_type.jl`, `test/handles_test.jl`, `test/anari_type_test.jl`, `design/work_plan.md`, `design/work_log.md`, `design/work_plan_sample.jl`
 - *Notes*: Supersedes the `Array1D{T}` / `Array1D{Any}` split described in Entries 11–12; Entry 13’s `anari_type` hook is now `Type{Array1D}` only. Field was named `element_type` briefly, then `eltype`.
+
+### Entry 17
+- *Summary*: Added `Array2D` and `Array3D` handle wrappers with stored extents and `eltype`; implemented `new_array2d` / `new_array3d` copy helpers (primitives and matrices/volumes of object handles), plus `map_array` / `unmap_array` overloads; extended `anari_type`, inferred `setparam!` object dtypes, and helide-backed tests for 2D/3D round-trips and raw-pointer fallbacks.
+- *Files*: `src/handles.jl`, `src/arrays.jl`, `src/parameters.jl`, `src/anari_type.jl`, `test/handles_test.jl`, `test/anari_type_test.jl`, `design/work_log.md`
+- *Notes*: Host copy order follows Julia column-major layout (`vec(data)`), aligned with ANARI `(numElements1, …)` fastest-varying first dimension; full test suite passes with `Pkg.test()`.

@@ -273,3 +273,71 @@ end
     @test_throws ArgumentError ANARI.map_array(dev, array)
     @test_throws ArgumentError ANARI.unmap_array(dev, array)
 end
+
+@testset "Handle wrappers array 2D/3D copy helpers" begin
+    lib = ANARI.Library("helide")
+    dev = ANARI.Device(lib, "default")
+
+    mat = Float32[i + 10j for i in 1:3, j in 1:4]
+    a2 = ANARI.new_array2d(dev, mat)
+    @test a2 isa ANARI.Array2D
+    @test eltype(a2) === Float32
+    @test size(a2) == (3, 4)
+    @test a2.ptr != C_NULL
+
+    m2 = ANARI.map_array(dev, a2)
+    @test m2 isa Matrix{Float32}
+    @test m2 == mat
+    ANARI.unmap_array(dev, a2)
+
+    vol = Float64[i + 10j + 100k for i in 1:2, j in 1:3, k in 1:2]
+    a3 = ANARI.new_array3d(dev, vol)
+    @test a3 isa ANARI.Array3D
+    @test eltype(a3) === Float64
+    @test size(a3) == (2, 3, 2)
+    @test a3.ptr != C_NULL
+
+    m3 = ANARI.map_array(dev, a3)
+    @test m3 isa Array{Float64,3}
+    @test m3 == vol
+    ANARI.unmap_array(dev, a3)
+
+    raw2 = ANARI.LibANARI.anariNewArray2D(
+        dev.ptr,
+        C_NULL,
+        C_NULL,
+        C_NULL,
+        ANARI.LibANARI.ANARI_FLOAT32,
+        UInt64(2),
+        UInt64(2),
+    )
+    fb2 = ANARI.Array2D(raw2, dev, (2, 2))
+    @test eltype(fb2) === Any
+    p2 = ANARI.map_array(dev, fb2)
+    @test p2 isa Ptr{Cvoid}
+    ANARI.unmap_array(dev, fb2)
+
+    raw3 = ANARI.LibANARI.anariNewArray3D(
+        dev.ptr,
+        C_NULL,
+        C_NULL,
+        C_NULL,
+        ANARI.LibANARI.ANARI_FLOAT32,
+        UInt64(1),
+        UInt64(1),
+        UInt64(1),
+    )
+    fb3 = ANARI.Array3D(raw3, dev, (1, 1, 1))
+    p3 = ANARI.map_array(dev, fb3)
+    @test p3 isa Ptr{Cvoid}
+    ANARI.unmap_array(dev, fb3)
+
+    ANARI.release!(a2)
+    ANARI.release!(a3)
+    ANARI.release!(fb2)
+    ANARI.release!(fb3)
+    ANARI.release!(dev)
+    ANARI.release!(lib)
+
+    @test_throws ArgumentError ANARI.map_array(dev, a2)
+end

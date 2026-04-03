@@ -15,6 +15,8 @@ export ANARIHandle,
        SpatialField,
        Volume,
        Array1D,
+       Array2D,
+       Array3D,
        release!
 
 abstract type ANARIHandle end
@@ -154,6 +156,70 @@ mutable struct Array1D <: ANARIObjectHandle
         return _attach_release_finalizer!(obj)
     end
 end
+
+"""
+    Array2D
+
+Wrapper for an `ANARIArray2D` handle. Element datatype and extents are fixed at runtime; the wrapper stores
+`dims::Tuple{UInt64,UInt64}` as `(numElements1, numElements2)` in ANARI order (the first dimension varies fastest
+in linear memory, matching Julia’s column-major `Matrix` layout). `new_array2d` sets `eltype` from the matrix element
+type, or `LibANARI.ANARIObject` for matrices of object handles. `Base.size(::Array2D)` returns `dims` as `Int` tuples.
+`Base.eltype(::Array2D)` returns the `eltype` field.
+"""
+mutable struct Array2D <: ANARIObjectHandle
+    ptr::LibANARI.ANARIArray2D
+    device::Device
+    dims::NTuple{2,UInt64}
+    eltype::Type
+
+    function Array2D(
+        ptr::LibANARI.ANARIArray2D,
+        device::Device,
+        dims::Tuple{Integer,Integer} = (0, 0),
+        eltype::Type = Any,
+    )
+        _require_nonnull(ptr, "anariNewArray2D")
+        (dims[1] < 0 || dims[2] < 0) && throw(ArgumentError("array dimensions must be non-negative"))
+        obj = new(ptr, device, (UInt64(dims[1]), UInt64(dims[2])), eltype)
+        return _attach_release_finalizer!(obj)
+    end
+end
+
+Base.size(a::Array2D) = (Int(a.dims[1]), Int(a.dims[2]))
+
+"""
+    Array3D
+
+Wrapper for an `ANARIArray3D` handle. Same conventions as `Array2D`, with `dims::Tuple{UInt64,UInt64,UInt64}` for
+`(numElements1, numElements2, numElements3)`; linear order matches Julia’s column-major `Array{T,3}` layout.
+"""
+mutable struct Array3D <: ANARIObjectHandle
+    ptr::LibANARI.ANARIArray3D
+    device::Device
+    dims::NTuple{3,UInt64}
+    eltype::Type
+
+    function Array3D(
+        ptr::LibANARI.ANARIArray3D,
+        device::Device,
+        dims::Tuple{Integer,Integer,Integer} = (0, 0, 0),
+        eltype::Type = Any,
+    )
+        _require_nonnull(ptr, "anariNewArray3D")
+        if dims[1] < 0 || dims[2] < 0 || dims[3] < 0
+            throw(ArgumentError("array dimensions must be non-negative"))
+        end
+        obj = new(
+            ptr,
+            device,
+            (UInt64(dims[1]), UInt64(dims[2]), UInt64(dims[3])),
+            eltype,
+        )
+        return _attach_release_finalizer!(obj)
+    end
+end
+
+Base.size(a::Array3D) = (Int(a.dims[1]), Int(a.dims[2]), Int(a.dims[3]))
 
 function Library(name::AbstractString; status_logging::Bool=false)
     callback_ptr = status_logging ? _STATUS_CALLBACK_PTR : C_NULL

@@ -38,6 +38,8 @@ anari_type(::Type{Sampler})       = LibANARI.ANARI_SAMPLER
 anari_type(::Type{SpatialField})  = LibANARI.ANARI_SPATIAL_FIELD
 anari_type(::Type{Volume})        = LibANARI.ANARI_VOLUME
 anari_type(::Type{Array1D}) = LibANARI.ANARI_ARRAY1D
+anari_type(::Type{Array2D}) = LibANARI.ANARI_ARRAY2D
+anari_type(::Type{Array3D}) = LibANARI.ANARI_ARRAY3D
 
 """
     setparam!(device, object, name, value)

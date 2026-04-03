@@ -11,6 +11,8 @@ end
 function _check_object_dtype(dtype::LibANARI.ANARIDataType)
     return dtype in (
         LibANARI.ANARI_ARRAY1D,
+        LibANARI.ANARI_ARRAY2D,
+        LibANARI.ANARI_ARRAY3D,
         LibANARI.ANARI_DEVICE,
         LibANARI.ANARI_OBJECT,
         LibANARI.ANARI_CAMERA,
