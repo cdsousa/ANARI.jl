@@ -10,6 +10,7 @@
 
     # Vector types
     @test ANARI.anari_type(NTuple{2, UInt32})  == L.ANARI_UINT32_VEC2
+    @test ANARI.anari_type(NTuple{3, UInt32})  == L.ANARI_UINT32_VEC3
     @test ANARI.anari_type(NTuple{2, Float32}) == L.ANARI_FLOAT32_VEC2
     @test ANARI.anari_type(NTuple{3, Float32}) == L.ANARI_FLOAT32_VEC3
     @test ANARI.anari_type(NTuple{4, Float32}) == L.ANARI_FLOAT32_VEC4

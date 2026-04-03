@@ -45,6 +45,9 @@ function _prepare_parameter_ref(dtype::LibANARI.ANARIDataType, value)
     elseif dtype == LibANARI.ANARI_UINT32_VEC2
         tuple_value = convert(NTuple{2, UInt32}, value)
         return Ref{NTuple{2, UInt32}}(tuple_value)
+    elseif dtype == LibANARI.ANARI_UINT32_VEC3
+        tuple_value = convert(NTuple{3, UInt32}, value)
+        return Ref{NTuple{3, UInt32}}(tuple_value)
     elseif dtype == LibANARI.ANARI_FLOAT32_VEC2
         tuple_value = convert(NTuple{2, Float32}, value)
         return Ref{NTuple{2, Float32}}(tuple_value)
@@ -54,6 +57,9 @@ function _prepare_parameter_ref(dtype::LibANARI.ANARIDataType, value)
     elseif dtype == LibANARI.ANARI_FLOAT32_VEC4
         tuple_value = convert(NTuple{4, Float32}, value)
         return Ref{NTuple{4, Float32}}(tuple_value)
+    elseif dtype == LibANARI.ANARI_DATA_TYPE
+        v = convert(LibANARI.ANARIDataType, value)
+        return Ref{LibANARI.ANARIDataType}(v)
     elseif _check_object_dtype(dtype)
         value isa ANARIHandle || throw(ArgumentError("value must be an ANARIHandle for object dtypes"))
         return Ref{LibANARI.ANARIObject}(_as_anari_object(value))

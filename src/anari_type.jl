@@ -18,6 +18,7 @@ anari_type(::Type{Float64}) = LibANARI.ANARI_FLOAT64
 
 # Vector types (as NTuples)
 anari_type(::Type{NTuple{2, UInt32}})  = LibANARI.ANARI_UINT32_VEC2
+anari_type(::Type{NTuple{3, UInt32}})  = LibANARI.ANARI_UINT32_VEC3
 anari_type(::Type{NTuple{2, Float32}}) = LibANARI.ANARI_FLOAT32_VEC2
 anari_type(::Type{NTuple{3, Float32}}) = LibANARI.ANARI_FLOAT32_VEC3
 anari_type(::Type{NTuple{4, Float32}}) = LibANARI.ANARI_FLOAT32_VEC4

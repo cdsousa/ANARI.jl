@@ -1,0 +1,14 @@
+# Standalone environment for `sample.jl` (image export). The ANARI package itself does not
+# depend on Images / FileIO / PNGFiles.
+
+[deps]
+ANARI = "e8f0e1a0-5c3a-4b1e-9f0a-1c2d3e4f5a6b"
+FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
+Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
+PNGFiles = "f57f5aa1-a3ce-4bc8-8ab9-96f992907883"
+
+[sources]
+ANARI = {path = ".."}
+
+[compat]
+julia = "1.11"
