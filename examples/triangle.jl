@@ -1,25 +1,14 @@
-# Example: idiomatic ANARI.jl usage aligned with `design/work_plan.md`.
-#
-# Requires a working ANARI device library (e.g. helide via ANARI_SDK_jll). From the repo root:
-#   julia --project=examples examples/sample.jl
-#
-# Dependencies (Images, FileIO, PNGFiles) live in `examples/Project.toml`, not the ANARI package.
-# Writes `sample_render.png` next to this script.
-
 using ANARI
 using ANARI.LibANARI: ANARI_DATA_TYPE, ANARI_UFIXED8_RGBA_SRGB
+
 using FileIO
 using Images
-using PNGFiles
 
 function sample()
-    out_path = joinpath(@__DIR__, "sample_render.png")
-
-    # --- Library & device (constructor-style API; raw FFI stays in `LibANARI`) ---
+    
     lib = Library("helide")
     dev = Device(lib, "default")
 
-    # --- Scene objects ---
     camera = Camera(dev, "perspective")
     renderer = Renderer(dev, "default")
     geometry = Geometry(dev, "triangle")
@@ -29,12 +18,10 @@ function sample()
     instance = Instance(dev, "transform")
     world = World(dev)
 
-    # --- Inferred `setparam!`: dtype from `anari_type(typeof(value))` ---
     setparam!(dev, camera, "position", (0.0f0, 0.0f0, 3.0f0))
     setparam!(dev, camera, "direction", (0.0f0, 0.0f0, -1.0f0))
     setparam!(dev, renderer, "background", (0.02f0, 0.02f0, 0.03f0))
 
-    # --- `new_array1d`: copy Julia data into ANARI-owned memory; returns `Array1D` ---
     vertices = [
         (-1.0f0, -1.0f0, 0.0f0),
         (1.0f0, -1.0f0, 0.0f0),
@@ -42,8 +29,8 @@ function sample()
     ]
     indices = [(UInt32(0), UInt32(1), UInt32(2))]
 
-    vtx_array = new_array1d(dev, vertices)
-    idx_array = new_array1d(dev, indices)
+    vtx_array = Array1D(dev, vertices)
+    idx_array = Array1D(dev, indices)
 
     setparam!(dev, geometry, "vertex.position", vtx_array)
     setparam!(dev, geometry, "primitive.index", idx_array)
@@ -65,13 +52,12 @@ function sample()
     setparam!(dev, world, "instance", instance_array)
     commit!(dev, world)
 
-    # --- Frame: enable RGBA8 color channel, then synchronous render + wait ---
     frame = Frame(dev)
     setparam!(dev, frame, "size", (UInt32(800), UInt32(600)))
     setparam!(dev, frame, "camera", camera)
     setparam!(dev, frame, "renderer", renderer)
     setparam!(dev, frame, "world", world)
-    # ANARI 1.1: `channel.color` is a DATA_TYPE parameter selecting the observable pixel format.
+    
     setparam!(dev, frame, "channel.color", ANARI_DATA_TYPE, ANARI_UFIXED8_RGBA_SRGB)
     commit!(dev, camera)
     commit!(dev, renderer)
@@ -81,9 +67,6 @@ function sample()
     render!(dev, frame)
     wait_frame!(dev, frame)
 
-    # --- Map frame: buffer is row-major RGBA8; wrap as `Matrix{RGBA{N0f8}}` for Images ---
-    # `unsafe_wrap`, `reshape`, and `transpose` alias the mapped memory (no copy). Unmap only
-    # after consumers finish reading—here, after `save` has written the PNG from that memory.
     channel = "channel.color"
     pixels_ptr, width, height, _pixel_type = map_frame(dev, frame, channel)
     w, h = Int(width), Int(height)
@@ -92,8 +75,7 @@ function sample()
 
     save(out_path, img)
     unmap_frame(dev, frame, channel)
-
-    # --- Explicit `release!` (idempotent); arrays used only as parameters can be released after world commits ---
+    
     release!(instance_array)
     release!(surface_array)
     release!(idx_array)
@@ -111,6 +93,7 @@ function sample()
     release!(dev)
     release!(lib)
 
+    out_path = joinpath(@__DIR__, "sample_render.png")
     println("Wrote ", out_path)
     return nothing
 end

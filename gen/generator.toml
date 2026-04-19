@@ -4,13 +4,12 @@ output_file_path = "../src/LibANARI.jl"
 module_name = "LibANARI"
 jll_pkg_name = "ANARI_SDK_jll"
 export_symbol_prefixes = ["ANARI", "anari"]
-auto_mutability = true
 
-[general.printer]
-use_ccall_macro = true
+use_julia_native_enum_type = true
 
 [codegen]
 use_ccall_macro = true
-use_julia_native_enum_type = false
 always_NUL_terminated_string = true
-opaque_as_mutable_struct = true
+
+[codegen.macro]
+macro_mode = "aggressive"

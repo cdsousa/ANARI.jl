@@ -4,4 +4,6 @@
 
 - Do not look into the folder *MY_NOTES/*.
 
+- README.md is the entry point for the project documentation.
+
 - Read online ANARI documentation (specification and SDK) when needed.

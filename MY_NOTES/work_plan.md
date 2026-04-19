@@ -6,7 +6,6 @@ This document captures agreed design decisions and a practical implementation pa
 
 - Keep `src/LibANARI.jl` as the generated low-level FFI layer.
 - Add Julia-idiomatic wrappers in `src/ANARI.jl` (or files included by it).
-- Do not remove low-level access; expose raw bindings through `LibANARI`.
 
 ## Final Design Decisions
 

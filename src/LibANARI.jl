@@ -3,8 +3,6 @@ module LibANARI
 using ANARI_SDK_jll
 export ANARI_SDK_jll
 
-using CEnum: CEnum, @cenum
-
 const ANARIDataType = Cint
 
 const ANARILogLevel = Cint
@@ -57,17 +55,15 @@ const ANARIVolume = Ptr{Cvoid}
 
 const ANARIWorld = Ptr{Cvoid}
 
-mutable struct ANARIParameter
+struct ANARIParameter
     name::Cstring
     type::ANARIDataType
-    ANARIParameter() = new()
 end
 
-mutable struct ANARIParameterValue
+struct ANARIParameterValue
     name::Cstring
     type::ANARIDataType
     value::Ptr{Cvoid}
-    ANARIParameterValue() = new()
 end
 
 # typedef void ( * ANARIMemoryDeleter ) ( const void * userPtr , const void * appMemory )
@@ -273,7 +269,7 @@ const ANARI_SDK_VERSION_MINOR = 15
 
 const ANARI_SDK_VERSION_PATCH = 0
 
-ANARI_DATA_TYPE_DEFINE(v) = ANARIDataType(v)
+ANARI_DATA_TYPE_DEFINE(v) = v
 
 const ANARI_UNKNOWN = ANARI_DATA_TYPE_DEFINE(0)
 
@@ -586,6 +582,8 @@ const ANARI_SEVERITY_DEBUG = 6
 # Skipping MacroDefinition: ANARI_INTERFACE __attribute__ ( ( __visibility__ ( "default" ) ) )
 
 # Skipping MacroDefinition: ANARI_DEPRECATED __attribute__ ( ( deprecated ) )
+
+ANARI_DEFAULT_VAL(a) = nothing
 
 # exports
 const PREFIXES = ["ANARI", "anari"]
