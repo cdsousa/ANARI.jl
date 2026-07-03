@@ -1,0 +1,15 @@
+name = "ANARI"
+uuid = "e8f0e1a0-5c3a-4b1e-9f0a-1c2d3e4f5a6b"
+version = "0.1.0"
+
+[deps]
+ANARI_SDK_jll = "b4f1dd5d-d354-485e-8d07-ad6f10ecf726"
+
+[compat]
+julia = "1.12"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
