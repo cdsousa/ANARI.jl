@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.11)
+project(anari_triangle CXX)
+set(CMAKE_CXX_STANDARD 17)
+find_package(anari REQUIRED)
+add_executable(triangle triangle.cpp)
+target_link_libraries(triangle PRIVATE anari::anari)
