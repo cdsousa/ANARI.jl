@@ -1,0 +1,9 @@
+# Vendored from KhronosGroup/ANARI-SDK code_gen/api/
+# Source: https://github.com/KhronosGroup/ANARI-SDK
+# Pinned: main branch, 2026-07-13
+#
+# Core API:
+#   anari_core_1_0.json
+#
+# KHR object metadata (via anari_core_objects_all_1_0.json):
+#   anari_core_objects_base_1_0.json + 49 khr_*.json files
