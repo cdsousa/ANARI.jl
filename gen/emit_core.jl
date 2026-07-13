@@ -48,6 +48,36 @@ function emit_structs(api::Dict{String,Any}, path::AbstractString)
     _write_file(path, join(lines, '\n'))
 end
 
+function _libanari_export_names(api::Dict{String,Any})
+    names = String["libanari", "ANARIHandle"]
+    for fun in api["functions"]
+        push!(names, fun["name"])
+    end
+    for opaque in api["opaqueTypes"]
+        push!(names, opaque["name"])
+    end
+    for typedef in get(api, "functionTypedefs", Any[])
+        push!(names, typedef["name"])
+    end
+    for st in api["structs"]
+        push!(names, st["name"])
+    end
+    for enum in api["enums"]
+        push!(names, enum["name"])
+        for value in enum["values"]
+            push!(names, value["name"])
+        end
+    end
+    append!(names, [
+        "DataTypeInfo", "DATATYPE_INFO", "datatype_info", "julia_type", "c_type",
+        "datatype_size", "datatype_components", "is_normalized",
+        "ParameterSpec", "PropertySpec",
+        "OBJECT_SUBTYPES", "OBJECT_PARAMETERS", "OBJECT_PROPERTIES", "ATTRIBUTES",
+        "object_subtypes", "parameter_specs", "property_specs", "parameter_spec", "is_required",
+    ])
+    return unique(names)
+end
+
 function _emit_function(lines, fun::Dict{String,Any})
     name = fun["name"]
     args = fun["arguments"]
@@ -93,6 +123,10 @@ function emit_libanari(api::Dict{String,Any}, path::AbstractString)
     end
 
     push!(lines, "include(\"objects.jl\")")
+    push!(lines, "")
+    for chunk in Iterators.partition(_libanari_export_names(api), 8)
+        push!(lines, "export " * join(chunk, ", "))
+    end
     push!(lines, "")
     push!(lines, "end # module")
     _write_file(path, join(lines, '\n'))
