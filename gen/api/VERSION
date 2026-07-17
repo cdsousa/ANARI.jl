@@ -1,9 +1,14 @@
 # Vendored from KhronosGroup/ANARI-SDK code_gen/api/
 # Source: https://github.com/KhronosGroup/ANARI-SDK
-# Pinned: main branch, 2026-07-13
+# Pinned: main branch @ d329427d67a343a02b6b36efebc7d8180a809d97 (2026-07-15)
+# Last API change: b20e258955d7f943662997f24bdcc61d5c81524d
+#   "Sync code_gen to current spec, fix typos, adapt CTS coverage and tests"
 #
 # Core API:
 #   anari_core_1_0.json
 #
-# KHR object metadata (via anari_core_objects_all_1_0.json):
-#   anari_core_objects_base_1_0.json + 49 khr_*.json files
+# Object metadata (via anari_core_objects_all_1_0.json):
+#   anari_core_objects_base_1_0.json + 49 khr_*.json dependencies
+#
+# Additional extension JSON (not in SPEC_ALL dependency tree):
+#   8 ext_*.json + 6 standalone khr_*.json
