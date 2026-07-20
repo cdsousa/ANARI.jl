@@ -4,9 +4,11 @@ include("generated/Generated.jl")
 using .Generated
 using .Generated.LibANARI
 
-include("set_parameter_safe.jl")
+include("handles.jl")
+include("setparam.jl")
 
 export LibANARI
-export set_parameter_safe
+export Library, Device, Object
+export setparam!, commit!, release!
 
 end # module ANARI

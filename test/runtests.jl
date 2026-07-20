@@ -38,3 +38,25 @@ end
 @testset "LibANARI loads" begin
     @test LibANARI.libanari != C_NULL
 end
+
+@testset "handle wrappers" begin
+    using ANARI: Library, Device, Object, setparam!, commit!, release!
+
+    @test_throws ArgumentError Library(C_NULL)
+
+    lib_handle = anariLoadLibrary("helide", C_NULL, C_NULL)
+    lib = Library(lib_handle)
+    @test lib.handle == lib_handle
+
+    dev = Device(lib, anariNewDevice(lib.handle, "default"))
+    @test dev.library === lib
+
+    @test_throws ArgumentError Object(dev, C_NULL)
+
+    cam = Object(dev, anariNewCamera(dev.handle, "perspective"))
+    setparam!(cam, "position", ANARI_FLOAT32_VEC3, (0.0f0, 0.0f0, 1.0f0))
+    commit!(cam)
+    release!(cam)
+    release!(dev)
+    release!(lib)
+end
