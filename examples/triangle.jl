@@ -5,11 +5,15 @@
 # Run:
 #   julia --project examples/triangle.jl
 #
+# Writes examples/triangle.png
+#
 # The helide backend is provided by ANARI_SDK_jll (preloaded on import).
 
 using ANARI_SDK_jll
 using ANARI.LibANARI
 using ANARI: set_parameter_safe
+using FileIO
+using Images
 
 function main()
     lib = anariLoadLibrary("helide", C_NULL, C_NULL)
@@ -97,11 +101,11 @@ function main()
         w = Int(width[])
         h = Int(height[])
         px = unsafe_wrap(Vector{UInt32}, Ptr{UInt32}(fb), w * h; own = false)
-
-        for i in (1, (h ÷ 2) * w + w ÷ 2 + 1)
-            p = px[i]
-            println("pixel[$i]: $(p & 0xFF) $((p >> 8) & 0xFF) $((p >> 16) & 0xFF)")
-        end
+        rgba = reinterpret(RGBA{N0f8}, copy(px))
+        img = permutedims(reshape(rgba, w, h), (2, 1))
+        output = joinpath(@__DIR__, "triangle.png")
+        save(output, img)
+        println("Saved render to ", output)
 
         anariUnmapFrame(dev, frame, "channel.color")
     end
