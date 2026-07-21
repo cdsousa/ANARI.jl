@@ -40,7 +40,9 @@ end
 end
 
 @testset "handle wrappers" begin
-    using ANARI: Library, Device, Object, setparam!, commit!, release!
+    using ANARI: Library, Device, Object, Camera, Geometry, Material, Surface
+    using ANARI: Group, Instance, World, Renderer, Frame, Array1D
+    using ANARI: setparam!, commit!, release!, object_data_type
 
     @test_throws ArgumentError Library(C_NULL)
 
@@ -53,10 +55,24 @@ end
 
     @test_throws ArgumentError Object(dev, C_NULL)
 
-    cam = Object(dev, anariNewCamera(dev.handle, "perspective"))
+    cam = Camera(dev, "perspective")
+    @test cam isa Camera
+    @test object_data_type(cam) == ANARI_CAMERA
+    @test cam.device === dev
     setparam!(cam, "position", ANARI_FLOAT32_VEC3, (0.0f0, 0.0f0, 1.0f0))
     commit!(cam)
+
+    geo = Geometry(dev, "triangle")
+    @test geo isa Geometry
+    @test object_data_type(geo) == ANARI_GEOMETRY
+
+    untyped = Object(dev, anariNewMaterial(dev.handle, "matte"))
+    @test untyped isa Object{UntypedObjectKind}
+    @test object_data_type(untyped) == ANARI_OBJECT
+    release!(untyped)
+
     release!(cam)
+    release!(geo)
     release!(dev)
     release!(lib)
 end

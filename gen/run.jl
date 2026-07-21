@@ -8,6 +8,7 @@ include("c_types.jl")
 include("emit_core.jl")
 include("emit_datatypes.jl")
 include("emit_objects.jl")
+include("emit_wrappers.jl")
 
 const API_DIR = joinpath(@__DIR__, "api")
 const OUT_DIR = joinpath(@__DIR__, "..", "src", "generated")
@@ -30,6 +31,7 @@ function main()
     emit_core(core_api, OUT_DIR)
     emit_datatypes(core_api, joinpath(OUT_DIR, "datatypes.jl"))
     emit_objects(objects_api, joinpath(OUT_DIR, "objects.jl"))
+    emit_wrappers(core_api, joinpath(OUT_DIR, "wrappers.jl"))
     emit_generated_module(OUT_DIR)
 
     @info "Generated Julia sources" OUT_DIR

@@ -28,20 +28,40 @@ struct Device
 end
 
 """
-    Object(device, handle)
+    ObjectKind
 
-Wrapper around an ANARI object handle. Keeps the owning `Device` (and
-`Library`) alive.
+Tag type for parametric ANARI object wrappers. Concrete subtypes such as
+`CameraKind` are generated in `generated/wrappers.jl`.
 """
-struct Object
+abstract type ObjectKind end
+
+"""
+    Object{K}(device, handle)
+
+Parametric wrapper around an ANARI object handle. Keeps the owning `Device`
+(and `Library`) alive.
+
+Typed aliases such as `Camera = Object{CameraKind}` are generated in
+`generated/wrappers.jl`.
+"""
+struct Object{K <: ObjectKind}
     device::Device
     handle::ANARIHandle
 
-    function Object(device::Device, handle::ANARIHandle)
+    function Object(device::Device, handle::ANARIHandle, ::Type{K}) where {K <: ObjectKind}
         handle == C_NULL && throw(ArgumentError("ANARI object handle is null"))
-        return new(device, handle)
+        return new{K}(device, handle)
     end
 end
+
+"""
+    Object(device, handle)
+
+Untyped object wrapper equivalent to `Object{UntypedObjectKind}`.
+"""
+struct UntypedObjectKind <: ObjectKind end
+
+Object(device::Device, handle::ANARIHandle) = Object(device, handle, UntypedObjectKind)
 
 _object_handle(object::Object) = object.handle
 _object_handle(object) = object

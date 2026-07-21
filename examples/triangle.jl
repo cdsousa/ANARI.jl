@@ -10,7 +10,8 @@
 
 using ANARI_SDK_jll
 using ANARI.LibANARI
-using ANARI: Library, Device, Object, setparam!, commit!, release!
+using ANARI: Library, Device, Camera, Geometry, Material, Surface, Group, Instance, World
+using ANARI: Renderer, Frame, Array1D, setparam!, commit!, release!
 using FileIO
 using Images
 
@@ -18,66 +19,66 @@ function main()
     lib = Library(anariLoadLibrary("helide", C_NULL, C_NULL))
     dev = Device(lib, anariNewDevice(lib.handle, "default"))
 
-    cam = Object(dev, anariNewCamera(dev.handle, "perspective"))
+    cam = Camera(dev, "perspective")
     setparam!(cam, "position", ANARI_FLOAT32_VEC3, (0.0f0, 0.0f0, 3.0f0))
     setparam!(cam, "direction", ANARI_FLOAT32_VEC3, (0.0f0, 0.0f0, -1.0f0))
     commit!(cam)
 
-    ren = Object(dev, anariNewRenderer(dev.handle, "default"))
+    ren = Renderer(dev, "default")
     setparam!(ren, "background", ANARI_FLOAT32_VEC3, (0.02f0, 0.02f0, 0.03f0))
     commit!(ren)
 
     vtx = NTuple{3, Float32}[(-1.0f0, -1.0f0, 0.0f0), (1.0f0, -1.0f0, 0.0f0), (0.0f0, 1.0f0, 0.0f0)]
     idx = NTuple{3, UInt32}[(0, 1, 2)]
-    geo = Object(dev, anariNewGeometry(dev.handle, "triangle"))
+    geo = Geometry(dev, "triangle")
     GC.@preserve vtx begin
-        vtx_array = Object(dev, anariNewArray1D(dev.handle, pointer(vtx), C_NULL, C_NULL, ANARI_FLOAT32_VEC3, 3))
+        vtx_array = Array1D(dev, pointer(vtx), C_NULL, C_NULL, ANARI_FLOAT32_VEC3, 3)
+        setparam!(geo, "vertex.position", ANARI_ARRAY1D, vtx_array)
+        release!(vtx_array)
     end
-    setparam!(geo, "vertex.position", ANARI_ARRAY1D, vtx_array)
-    release!(vtx_array)
     GC.@preserve idx begin
-        idx_array = Object(dev, anariNewArray1D(dev.handle, pointer(idx), C_NULL, C_NULL, ANARI_UINT32_VEC3, 1))
+        idx_array = Array1D(dev, pointer(idx), C_NULL, C_NULL, ANARI_UINT32_VEC3, 1)
+        setparam!(geo, "primitive.index", ANARI_ARRAY1D, idx_array)
+        release!(idx_array)
     end
-    setparam!(geo, "primitive.index", ANARI_ARRAY1D, idx_array)
-    release!(idx_array)
     commit!(geo)
 
-    mat = Object(dev, anariNewMaterial(dev.handle, "matte"))
+    mat = Material(dev, "matte")
     commit!(mat)
 
-    surf = Object(dev, anariNewSurface(dev.handle))
+    surf = Surface(dev)
     setparam!(surf, "geometry", ANARI_GEOMETRY, geo)
     release!(geo)
     setparam!(surf, "material", ANARI_MATERIAL, mat)
     release!(mat)
     commit!(surf)
 
-    grp = Object(dev, anariNewGroup(dev.handle))
+    grp = Group(dev)
     surfaces = ANARISurface[surf.handle]
     GC.@preserve surfaces begin
-        surface_array = Object(dev, anariNewArray1D(dev.handle, pointer(surfaces), C_NULL, C_NULL, ANARI_SURFACE, 1))
+        surface_array = Array1D(dev, pointer(surfaces), C_NULL, C_NULL, ANARI_SURFACE, 1)
+        setparam!(grp, "surface", ANARI_ARRAY1D, surface_array)
+        release!(surface_array)
     end
-    setparam!(grp, "surface", ANARI_ARRAY1D, surface_array)
-    release!(surface_array)
     release!(surf)
     commit!(grp)
 
-    inst = Object(dev, anariNewInstance(dev.handle, "transform"))
+    inst = Instance(dev, "transform")
     setparam!(inst, "group", ANARI_GROUP, grp)
     release!(grp)
     commit!(inst)
 
-    world = Object(dev, anariNewWorld(dev.handle))
+    world = World(dev)
     instances = ANARIInstance[inst.handle]
     GC.@preserve instances begin
-        instance_array = Object(dev, anariNewArray1D(dev.handle, pointer(instances), C_NULL, C_NULL, ANARI_INSTANCE, 1))
+        instance_array = Array1D(dev, pointer(instances), C_NULL, C_NULL, ANARI_INSTANCE, 1)
+        setparam!(world, "instance", ANARI_ARRAY1D, instance_array)
+        release!(instance_array)
     end
-    setparam!(world, "instance", ANARI_ARRAY1D, instance_array)
-    release!(instance_array)
     release!(inst)
     commit!(world)
 
-    frame = Object(dev, anariNewFrame(dev.handle))
+    frame = Frame(dev)
     setparam!(frame, "size", ANARI_UINT32_VEC2, (UInt32(800), UInt32(600)))
     setparam!(frame, "channel.color", ANARI_DATA_TYPE, ANARI_UFIXED8_RGBA_SRGB)
     setparam!(frame, "camera", ANARI_CAMERA, cam)
@@ -90,6 +91,7 @@ function main()
 
     anariRenderFrame(dev.handle, frame.handle)
     while anariFrameReady(dev.handle, frame.handle, ANARI_WAIT) == 0
+        sleep(0.01)
     end
 
     width = Ref{UInt32}(0)

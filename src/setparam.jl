@@ -5,7 +5,7 @@
 Call `anariSetParameter` with `value` wrapped in a `Ref` and pinned via
 `GC.@preserve` for the duration of the call.
 
-Accepts raw handles, `Device`/`Object` wrappers, and `Object` values for
+Accepts raw handles, `Device`/`Object` wrappers, and typed object values for
 object-typed parameters.
 """
 function setparam!(device, object, name::AbstractString, dataType, value)
