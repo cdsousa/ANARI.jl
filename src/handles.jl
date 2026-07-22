@@ -1,14 +1,17 @@
 """
     Library(handle)
 
-Wrapper around an `ANARILibrary` handle.
+Wrapper around an `ANARILibrary` handle. Registers a finalizer that calls
+`release!`; see [`release!`](@ref) for manual cleanup.
 """
-struct Library
+mutable struct Library
     handle::ANARILibrary
 
     function Library(handle::ANARILibrary)
         handle == C_NULL && throw(ArgumentError("ANARI library handle is null"))
-        return new(handle)
+        lib = new(handle)
+        finalizer(release!, lib)
+        return lib
     end
 end
 
@@ -16,14 +19,18 @@ end
     Device(library, handle)
 
 Wrapper around an `ANARIDevice` handle. Keeps the owning `Library` alive.
+Registers a finalizer that calls `release!`; see [`release!`](@ref) for manual
+cleanup.
 """
-struct Device
+mutable struct Device
     library::Library
     handle::ANARIDevice
 
     function Device(library::Library, handle::ANARIDevice)
         handle == C_NULL && throw(ArgumentError("ANARI device handle is null"))
-        return new(library, handle)
+        dev = new(library, handle)
+        finalizer(release!, dev)
+        return dev
     end
 end
 
@@ -39,18 +46,21 @@ abstract type ObjectKind end
     Object{K}(device, handle)
 
 Parametric wrapper around an ANARI object handle. Keeps the owning `Device`
-(and `Library`) alive.
+(and `Library`) alive. Registers a finalizer that calls `release!`; see
+[`release!`](@ref) for manual cleanup.
 
 Typed aliases such as `Camera = Object{CameraKind}` are generated in
 `generated/wrappers.jl`.
 """
-struct Object{K <: ObjectKind}
+mutable struct Object{K <: ObjectKind}
     device::Device
     handle::ANARIHandle
 
     function Object(device::Device, handle::ANARIHandle, ::Type{K}) where {K <: ObjectKind}
         handle == C_NULL && throw(ArgumentError("ANARI object handle is null"))
-        return new{K}(device, handle)
+        obj = new{K}(device, handle)
+        finalizer(release!, obj)
+        return obj
     end
 end
 

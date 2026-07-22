@@ -48,9 +48,7 @@ function main()
 
     surf = Surface(dev)
     setparam!(surf, "geometry", ANARI_GEOMETRY, geo)
-    release!(geo)
     setparam!(surf, "material", ANARI_MATERIAL, mat)
-    release!(mat)
     commit!(surf)
 
     grp = Group(dev)
@@ -60,12 +58,10 @@ function main()
         setparam!(grp, "surface", ANARI_ARRAY1D, surface_array)
         release!(surface_array)
     end
-    release!(surf)
     commit!(grp)
 
     inst = Instance(dev, "transform")
     setparam!(inst, "group", ANARI_GROUP, grp)
-    release!(grp)
     commit!(inst)
 
     world = World(dev)
@@ -75,18 +71,14 @@ function main()
         setparam!(world, "instance", ANARI_ARRAY1D, instance_array)
         release!(instance_array)
     end
-    release!(inst)
     commit!(world)
 
     frame = Frame(dev)
     setparam!(frame, "size", ANARI_UINT32_VEC2, (UInt32(800), UInt32(600)))
     setparam!(frame, "channel.color", ANARI_DATA_TYPE, ANARI_UFIXED8_RGBA_SRGB)
     setparam!(frame, "camera", ANARI_CAMERA, cam)
-    release!(cam)
     setparam!(frame, "renderer", ANARI_RENDERER, ren)
-    release!(ren)
     setparam!(frame, "world", ANARI_WORLD, world)
-    release!(world)
     commit!(frame)
 
     anariRenderFrame(dev.handle, frame.handle)
@@ -110,9 +102,6 @@ function main()
 
         anariUnmapFrame(dev.handle, frame.handle, "channel.color")
     end
-    release!(frame)
-    release!(dev)
-    release!(lib)
 end
 
 main()
