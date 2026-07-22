@@ -55,80 +55,80 @@ object_data_type(::Object{WorldKind}) = ANARI_WORLD
 
 function Array1D(device::Device, appMemory::Ptr, deleter::ANARIMemoryDeleter, userData::Ptr, dataType::ANARIDataType, numElements1::Integer)
     handle = anariNewArray1D(device.handle, Ptr{Cvoid}(appMemory), deleter, Ptr{Cvoid}(userData), dataType, UInt64(numElements1))
-    return Object(device, handle, Array1DKind)
+    return Object{Array1DKind}(device, handle)
 end
 
 function Array2D(device::Device, appMemory::Ptr, deleter::ANARIMemoryDeleter, userData::Ptr, dataType::ANARIDataType, numElements1::Integer, numElements2::Integer)
     handle = anariNewArray2D(device.handle, Ptr{Cvoid}(appMemory), deleter, Ptr{Cvoid}(userData), dataType, UInt64(numElements1), UInt64(numElements2))
-    return Object(device, handle, Array2DKind)
+    return Object{Array2DKind}(device, handle)
 end
 
 function Array3D(device::Device, appMemory::Ptr, deleter::ANARIMemoryDeleter, userData::Ptr, dataType::ANARIDataType, numElements1::Integer, numElements2::Integer, numElements3::Integer)
     handle = anariNewArray3D(device.handle, Ptr{Cvoid}(appMemory), deleter, Ptr{Cvoid}(userData), dataType, UInt64(numElements1), UInt64(numElements2), UInt64(numElements3))
-    return Object(device, handle, Array3DKind)
+    return Object{Array3DKind}(device, handle)
 end
 
 function Camera(device::Device, subtype::AbstractString)
     handle = anariNewCamera(device.handle, subtype)
-    return Object(device, handle, CameraKind)
+    return Object{CameraKind}(device, handle)
 end
 
 function Frame(device::Device)
     handle = anariNewFrame(device.handle)
-    return Object(device, handle, FrameKind)
+    return Object{FrameKind}(device, handle)
 end
 
 function Geometry(device::Device, subtype::AbstractString)
     handle = anariNewGeometry(device.handle, subtype)
-    return Object(device, handle, GeometryKind)
+    return Object{GeometryKind}(device, handle)
 end
 
 function Group(device::Device)
     handle = anariNewGroup(device.handle)
-    return Object(device, handle, GroupKind)
+    return Object{GroupKind}(device, handle)
 end
 
 function Instance(device::Device, subtype::AbstractString)
     handle = anariNewInstance(device.handle, subtype)
-    return Object(device, handle, InstanceKind)
+    return Object{InstanceKind}(device, handle)
 end
 
 function Light(device::Device, subtype::AbstractString)
     handle = anariNewLight(device.handle, subtype)
-    return Object(device, handle, LightKind)
+    return Object{LightKind}(device, handle)
 end
 
 function Material(device::Device, subtype::AbstractString)
     handle = anariNewMaterial(device.handle, subtype)
-    return Object(device, handle, MaterialKind)
+    return Object{MaterialKind}(device, handle)
 end
 
 function Renderer(device::Device, subtype::AbstractString)
     handle = anariNewRenderer(device.handle, subtype)
-    return Object(device, handle, RendererKind)
+    return Object{RendererKind}(device, handle)
 end
 
 function Sampler(device::Device, subtype::AbstractString)
     handle = anariNewSampler(device.handle, subtype)
-    return Object(device, handle, SamplerKind)
+    return Object{SamplerKind}(device, handle)
 end
 
 function SpatialField(device::Device, subtype::AbstractString)
     handle = anariNewSpatialField(device.handle, subtype)
-    return Object(device, handle, SpatialFieldKind)
+    return Object{SpatialFieldKind}(device, handle)
 end
 
 function Surface(device::Device)
     handle = anariNewSurface(device.handle)
-    return Object(device, handle, SurfaceKind)
+    return Object{SurfaceKind}(device, handle)
 end
 
 function Volume(device::Device, subtype::AbstractString)
     handle = anariNewVolume(device.handle, subtype)
-    return Object(device, handle, VolumeKind)
+    return Object{VolumeKind}(device, handle)
 end
 
 function World(device::Device)
     handle = anariNewWorld(device.handle)
-    return Object(device, handle, WorldKind)
+    return Object{WorldKind}(device, handle)
 end

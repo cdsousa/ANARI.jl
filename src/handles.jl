@@ -56,7 +56,7 @@ mutable struct Object{K <: ObjectKind}
     device::Device
     handle::ANARIHandle
 
-    function Object(device::Device, handle::ANARIHandle, ::Type{K}) where {K <: ObjectKind}
+    function Object{K}(device::Device, handle::ANARIHandle) where {K <: ObjectKind}
         handle == C_NULL && throw(ArgumentError("ANARI object handle is null"))
         obj = new{K}(device, handle)
         finalizer(release!, obj)
@@ -71,7 +71,7 @@ Untyped object wrapper equivalent to `Object{UntypedObjectKind}`.
 """
 struct UntypedObjectKind <: ObjectKind end
 
-Object(device::Device, handle::ANARIHandle) = Object(device, handle, UntypedObjectKind)
+Object(device::Device, handle::ANARIHandle) = Object{UntypedObjectKind}(device, handle)
 
 _object_handle(object::Object) = object.handle
 _object_handle(object) = object
@@ -81,3 +81,37 @@ _device_handle(device::ANARIDevice) = device
 
 _parameter_value(value::Object) = value.handle
 _parameter_value(value) = value
+
+"""
+    release!(object)
+    release!(device)
+    release!(library)
+
+Call `anariRelease` or `anariUnloadLibrary` as appropriate.
+"""
+function release!(object::Object)
+    handle = object.handle
+    if handle != C_NULL
+        object.handle = C_NULL
+        anariRelease(object.device.handle, handle)
+    end
+    return nothing
+end
+
+function release!(device::Device)
+    handle = device.handle
+    if handle != C_NULL
+        device.handle = C_NULL
+        anariRelease(handle, handle)
+    end
+    return nothing
+end
+
+function release!(library::Library)
+    handle = library.handle
+    if handle != C_NULL
+        library.handle = C_NULL
+        anariUnloadLibrary(handle)
+    end
+    return nothing
+end

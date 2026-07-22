@@ -87,7 +87,7 @@ function _emit_constructor(wrapper_name::AbstractString, kind_name::AbstractStri
     return """
     function $wrapper_name(device::Device$(isempty(sig) ? "" : ", " * sig))
         handle = $fname($call)
-        return Object(device, handle, $kind_name)
+        return Object{$kind_name}(device, handle)
     end
     """
 end

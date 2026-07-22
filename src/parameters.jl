@@ -39,37 +39,3 @@ function commit!(device, object)
 end
 
 commit!(object::Object) = commit!(object.device, object)
-
-"""
-    release!(object)
-    release!(device)
-    release!(library)
-
-Call `anariRelease` or `anariUnloadLibrary` as appropriate.
-"""
-function release!(object::Object)
-    handle = object.handle
-    if handle != C_NULL
-        object.handle = C_NULL
-        anariRelease(object.device.handle, handle)
-    end
-    return nothing
-end
-
-function release!(device::Device)
-    handle = device.handle
-    if handle != C_NULL
-        device.handle = C_NULL
-        anariRelease(handle, handle)
-    end
-    return nothing
-end
-
-function release!(library::Library)
-    handle = library.handle
-    if handle != C_NULL
-        library.handle = C_NULL
-        anariUnloadLibrary(handle)
-    end
-    return nothing
-end

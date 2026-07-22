@@ -6,7 +6,7 @@ using .Generated.LibANARI
 
 include("handles.jl")
 include("generated/wrappers.jl")
-include("setparam.jl")
+include("parameters.jl")
 
 export LibANARI
 export Library, Device, Object, ObjectKind, UntypedObjectKind, object_data_type
